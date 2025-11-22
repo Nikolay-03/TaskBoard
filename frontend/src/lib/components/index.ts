@@ -4,3 +4,4 @@ import LogoutButton from "./LogoutButton.svelte";
 import Navigation from './Navigation.svelte'
 import UserAvatar from './UserAvatar.svelte'
 export {Menu, ThemeSwitcher, LogoutButton, Navigation, UserAvatar}
+export * from './Board'
