@@ -4,7 +4,7 @@
     import {flip} from 'svelte/animate';
     import {dndzone} from 'svelte-dnd-action';
     import {CardContent} from "$lib/ui/index.js";
-    import {BoardCard} from "$lib/components";
+    import {AddTaskButton, BoardCard} from "$lib/components";
 
     interface Props {
         column: IColumn,
@@ -15,12 +15,13 @@
 
     const {column, handleDndFinalizeCards, handleDndConsiderCards, flipDurationMs}: Props = $props();
 </script>
-<Card class="h-full border-dotted border-2">
+<Card class="h-full border-dashed border-2">
     <CardHeader>
         <CardTitle class="text-center">{column.name}</CardTitle>
     </CardHeader>
-    <CardContent class="min-w-[350px] h-full px-3">
-        <div class="h-full flex flex-col gap-3" use:dndzone={{items: column.items, flipDurationMs, dropTargetClasses: ["!outline-none"]}}
+    <CardContent class="min-w-[350px] h-full px-3 flex flex-col gap-3">
+        <div class="flex flex-col gap-3 min-h-5"
+             use:dndzone={{items: column.items, flipDurationMs, dropTargetClasses: ["!outline-none"]}}
              on:consider={(e) => handleDndConsiderCards(column.id, e)}
              on:finalize={(e) => handleDndFinalizeCards(column.id, e)}>
             {#each column.items as item (item.id)}
@@ -28,6 +29,7 @@
                     <BoardCard {...item}/>
                 </div>
             {/each}
+           <AddTaskButton {flipDurationMs}/>
         </div>
     </CardContent>
 </Card>
