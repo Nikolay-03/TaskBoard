@@ -7,8 +7,8 @@
 
     interface Props {
         column: IColumn,
-        handleDndConsiderCards: (id: number, e: any) => void;
-        handleDndFinalizeCards: (id: number, e: any) => void;
+        handleDndConsiderCards: (id: number, e: CustomEvent) => void;
+        handleDndFinalizeCards: (id: number, e: CustomEvent) => void;
         flipDurationMs: number;
     }
 
@@ -18,7 +18,7 @@
     <CardHeader>
         <CardTitle class="text-center">{column.name}</CardTitle>
     </CardHeader>
-    <CardContent class="min-w-[350px] h-full px-3 flex flex-col gap-3">
+    <CardContent class="w-[350px] h-full px-3 flex flex-col gap-3">
         <div class="flex flex-col gap-3 min-h-5"
              use:dndzone={{items: column.items, flipDurationMs, dropTargetClasses: ["!outline-none"]}}
              on:consider={(e) => handleDndConsiderCards(column.id, e)}
