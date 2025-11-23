@@ -19,7 +19,7 @@
             <CardContent>
                 <div class="flex gap-2 flex-wrap">
                     {#each mockLabels as label (label.id)}
-                        <Badge>{label.name}</Badge>
+                        <Badge variant={label.variant}>{label.name}</Badge>
                     {/each}
                 </div>
             </CardContent>

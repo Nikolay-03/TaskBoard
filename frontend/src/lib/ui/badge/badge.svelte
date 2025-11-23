@@ -12,6 +12,13 @@
 				destructive:
 					"bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 border-transparent text-white",
 				outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+				violet: 'bg-violet-500 text-white',
+				orange: 'bg-orange-500 text-white',
+				fuchsia: 'bg-fuchsia-500 text-white',
+				slate: 'bg-slate-500 text-white',
+				cyan: 'bg-cyan-500 text-white',
+				blue: 'bg-blue-500 text-white',
+				indigo: 'bg-indigo-500 text-white',
 			},
 		},
 		defaultVariants: {
