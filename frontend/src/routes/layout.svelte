@@ -11,7 +11,7 @@
     <Menu/>
     <section class="w-full flex-1 flex flex-col gap-4 overflow-hidden">
         <div class="flex items-center justify-center relative">
-            <h1 class="font-bold text-4xl">TaskBoard</h1>
+            <h1 class="font-bold text-4xl">PlanForge</h1>
             <UserAvatar className="absolute right-0"/>
         </div>
         <MainWrapper>

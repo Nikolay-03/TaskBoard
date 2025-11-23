@@ -11,5 +11,5 @@
         <AvatarImage src="https://i.pinimg.com/originals/7f/19/11/7f1911596ca5d6fa54f1584ba618f2d3.jpg" alt="@shadcn"/>
         <AvatarFallback>CN</AvatarFallback>
     </Avatar>
-    Shadcn App
+    Ilnitsky Nikolay
 </div>
