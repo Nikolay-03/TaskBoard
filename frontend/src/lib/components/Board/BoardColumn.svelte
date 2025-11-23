@@ -1,9 +1,8 @@
 <script lang="ts">
-    import {Card, CardHeader, CardTitle} from '$lib/ui'
+    import {Card, CardHeader, CardTitle, CardContent} from '$lib/ui/card'
     import type {IColumn} from "$lib/types/board";
     import {flip} from 'svelte/animate';
     import {dndzone} from 'svelte-dnd-action';
-    import {CardContent} from "$lib/ui/index.js";
     import {AddTaskButton, BoardCard} from "$lib/components";
 
     interface Props {

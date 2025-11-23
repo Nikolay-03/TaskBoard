@@ -9,5 +9,8 @@ export default defineConfig({
     plugins: [tailwindcss(), svelte(), router({
         path: 'src/routes',
     }),],
-    resolve: {alias: {$lib: path.resolve("./src/lib")}}
+    resolve: {alias: {
+        $lib: path.resolve("./src/lib"),
+        $api: path.resolve("./src/api"),
+    }}
 });

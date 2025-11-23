@@ -10,23 +10,23 @@
 
     let {columnItems}: Props = $props();
 
-    function handleDndConsiderColumns(e) {
+    function handleDndConsiderColumns(e: CustomEvent) {
         columnItems = e.detail.items;
     }
 
-    function handleDndFinalizeColumns(e) {
+    function handleDndFinalizeColumns(e: CustomEvent) {
         columnItems = e.detail.items;
     }
 
     const flipDurationMs = 200;
 
-    function handleDndConsiderCards(cid, e) {
+    function handleDndConsiderCards(cid: number, e: CustomEvent) {
         const colIdx = columnItems.findIndex(c => c.id === cid);
         columnItems[colIdx].items = e.detail.items;
         columnItems = [...columnItems];
     }
 
-    function handleDndFinalizeCards(cid, e) {
+    function handleDndFinalizeCards(cid: number, e: CustomEvent) {
         const colIdx = columnItems.findIndex(c => c.id === cid);
         columnItems[colIdx].items = e.detail.items;
         columnItems = [...columnItems];
