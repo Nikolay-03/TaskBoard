@@ -2,7 +2,7 @@
 	import { type VariantProps, tv } from "tailwind-variants";
 
 	export const badgeVariants = tv({
-		base: "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium transition-[color,box-shadow] focus-visible:ring-[3px] [&>svg]:pointer-events-none [&>svg]:size-3",
+		base: "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium transition-[color,box-shadow] focus-visible:ring-[3px] [&>svg]:pointer-events-none [&>svg]:size-3",
 		variants: {
 			variant: {
 				default:
@@ -12,13 +12,13 @@
 				destructive:
 					"bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 border-transparent text-white",
 				outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-				violet: 'bg-violet-500 text-white',
-				orange: 'bg-orange-500 text-white',
-				fuchsia: 'bg-fuchsia-500 text-white',
-				slate: 'bg-slate-500 text-white',
-				cyan: 'bg-cyan-500 text-white',
-				blue: 'bg-blue-500 text-white',
-				indigo: 'bg-indigo-500 text-white',
+				violet: 'bg-violet-200 text-violet-800 ',
+				orange: 'bg-orange-200 text-orange-800',
+				fuchsia: 'bg-fuchsia-200 text-fuchsia-800',
+				slate: 'bg-slate-200 text-slate-800',
+				cyan: 'bg-cyan-200 text-cyan-800',
+				blue: 'bg-blue-200 text-blue-800',
+				indigo: 'bg-indigo-200 text-indigo-800',
 			},
 		},
 		defaultVariants: {
