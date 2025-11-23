@@ -1,15 +1,19 @@
 <script lang="ts">
+    import { navigate } from 'sv-router/generated';
     import {menuItems, type IMenuItem} from '$lib/shared'
     import {Button} from "$lib/ui/button/index.js";
 </script>
 {#snippet menuItem(item: IMenuItem)}
     <li>
-        <a href={item.href}>
-            <Button variant="ghost" size="lg" class="w-full justify-start gap-2">
-                <svelte:component this={item.icon} size={20}/>
-                {item.name}
-            </Button>
-        </a>
+        <Button
+                variant="ghost"
+                size="lg"
+                class="w-full justify-start gap-2"
+                onclick={() => navigate(item.href)}
+        >
+            <svelte:component this={item.icon} size={20}/>
+            {item.name}
+        </Button>
     </li>
 {/snippet}
 <nav>
