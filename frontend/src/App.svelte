@@ -1,8 +1,6 @@
 <script context="module">
-  import { Router, createRouter } from '@roxi/routify'
-  import routes from '../.routify/routes.default.js'
-
-  export const router = createRouter({ routes })
+    import { Router } from 'sv-router';
+    import 'sv-router/generated';
 </script>
 
-<Router {router} />
+<Router />

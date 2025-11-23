@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "baseUrl": "..",
+    "paths": {
+      "sv-router/generated": [
+        ".router/router.ts"
+      ]
+    }
+  },
+  "include": [
+    "../src/**/*.js",
+    "../src/**/*.ts",
+    "../src/**/*.svelte",
+    "../tests/**/*.js",
+    "../tests/**/*.ts",
+    "../tests/**/*.svelte",
+    "./router.ts"
+  ]
+}
