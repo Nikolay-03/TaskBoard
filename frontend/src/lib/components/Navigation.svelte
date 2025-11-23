@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { navigate } from 'sv-router/generated';
+    import {navigate} from 'sv-router/generated';
     import {menuItems, type IMenuItem} from '$lib/shared'
     import {Button} from "$lib/ui/button/index.js";
 </script>

@@ -1,6 +1,7 @@
 <script lang="ts">
     import {Card, CardHeader, CardTitle, CardDescription} from '$lib/ui'
     import type {ICard} from "$lib/types/board";
+
     const {title, description}: ICard = $props();
 </script>
 <Card>
