@@ -70,5 +70,24 @@ public class TaskLabelRepository {
         return result;
     }
 
-    // по желанию: addLabelToTask(taskId, labelId), removeLabelFromTask(taskId, labelId)
+    public void addLabelToTask(long taskId, long labelId) throws SQLException {
+        String sql = "INSERT INTO task_labels(task_id, label_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, taskId);
+            ps.setLong(2, labelId);
+            ps.executeUpdate();
+        }
+    }
+
+    public void removeLabelFromTask(long taskId, long labelId) throws SQLException {
+        String sql = "DELETE FROM task_labels WHERE task_id = ? AND label_id = ?";
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, taskId);
+            ps.setLong(2, labelId);
+            ps.executeUpdate();
+        }
+    }
+
 }

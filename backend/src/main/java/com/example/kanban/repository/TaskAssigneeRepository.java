@@ -70,5 +70,24 @@ public class TaskAssigneeRepository {
         return result;
     }
 
-    // по желанию: методы addAssignee(taskId, userId), removeAssignee(taskId, userId)
+    public void addAssignee(long taskId, long userId) throws SQLException {
+        String sql = "INSERT INTO task_assignees(task_id, user_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, taskId);
+            ps.setLong(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
+    public void removeAssignee(long taskId, long userId) throws SQLException {
+        String sql = "DELETE FROM task_assignees WHERE task_id = ? AND user_id = ?";
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, taskId);
+            ps.setLong(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import com.example.kanban.db.ConnectionManager;
 import com.example.kanban.http.Router;
 import com.example.kanban.http.handlers.AuthHandler;
 import com.example.kanban.http.handlers.BoardHandler;
+import com.example.kanban.http.handlers.TaskHandler;
 import com.example.kanban.repository.*;
 import com.example.kanban.service.AuthService;
 import com.example.kanban.service.BoardService;
@@ -26,11 +27,21 @@ public class Main {
         TaskAssigneeRepository assigneeRepo = new TaskAssigneeRepository(cm);
         TaskParticipantRepository participantRepo = new TaskParticipantRepository(cm);
         TaskLabelRepository labelRepo = new TaskLabelRepository(cm);
+        ColumnRepository columnRepo = new ColumnRepository(cm);
+        TaskRepository taskRepo = new TaskRepository(cm);
 
         // Сервисы
         AuthService authService = new AuthService(userRepo, sessionRepo);
         BoardService boardService = new BoardService(
-                boardRepo, assigneeRepo, participantRepo, labelRepo
+                boardRepo, columnRepo,taskRepo, assigneeRepo, participantRepo, labelRepo
+        );
+        TaskHandler taskHandler = new TaskHandler(
+                authService,
+                taskRepo,
+                columnRepo,
+                assigneeRepo,
+                participantRepo,
+                labelRepo
         );
 
         // HTTP-сервер

@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HexFormat;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class AuthService {
@@ -22,36 +21,24 @@ public class AuthService {
         this.sessionRepository = sessionRepository;
     }
 
-    // ---------- Регистрация ----------
-
     public User register(String email, String password, String name) throws Exception {
-        // можно добавить валидацию email/пароля
         User existing = userRepository.findByEmail(email);
         if (existing != null) {
-            throw new IllegalStateException("User with this email already exists");
+            throw new IllegalStateException("User already exists");
         }
-
         String hash = hashPassword(password);
         return userRepository.createUser(email, hash, name);
     }
 
-    // ---------- Логин ----------
-
     public User login(String email, String password) throws Exception {
         User user = userRepository.findByEmail(email);
-        if (user == null) {
-            return null;
-        }
-
+        if (user == null) return null;
         String hash = hashPassword(password);
         if (!hash.equals(user.getPasswordHash())) {
             return null;
         }
-
         return user;
     }
-
-    // ---------- Сессии ----------
 
     public String createSession(long userId) throws SQLException {
         String sessionId = UUID.randomUUID().toString().replace("-", "");
@@ -69,8 +56,6 @@ public class AuthService {
     public void logout(String sessionId) throws SQLException {
         sessionRepository.deleteBySessionId(sessionId);
     }
-
-    // ---------- Внутренние хелперы ----------
 
     private String hashPassword(String password) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");

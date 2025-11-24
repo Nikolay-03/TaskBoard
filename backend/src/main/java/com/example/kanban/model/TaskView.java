@@ -14,108 +14,43 @@ public class TaskView {
     private LocalDate dueDate;
     private Instant createdAt;
     private Instant updatedAt;
-
-    // только для задач:
     private List<User> assignees;
     private List<User> participants;
     private List<Label> labels;
 
-    public TaskView() {
-    }
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
 
-    public long getId() {
-        return id;
-    }
+    public long getBoardId() { return boardId; }
+    public void setBoardId(long boardId) { this.boardId = boardId; }
 
-    public void setId(long id) {
-        this.id = id;
-    }
+    public long getColumnId() { return columnId; }
+    public void setColumnId(long columnId) { this.columnId = columnId; }
 
-    public long getBoardId() {
-        return boardId;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public void setBoardId(long boardId) {
-        this.boardId = boardId;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public long getColumnId() {
-        return columnId;
-    }
+    public int getPosition() { return position; }
+    public void setPosition(int position) { this.position = position; }
 
-    public void setColumnId(long columnId) {
-        this.columnId = columnId;
-    }
+    public LocalDate getDueDate() { return dueDate; }
+    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
 
-    public String getTitle() {
-        return title;
-    }
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public Instant getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 
-    public String getDescription() {
-        return description;
-    }
+    public List<User> getAssignees() { return assignees; }
+    public void setAssignees(List<User> assignees) { this.assignees = assignees; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public List<User> getParticipants() { return participants; }
+    public void setParticipants(List<User> participants) { this.participants = participants; }
 
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<User> getAssignees() {
-        return assignees;
-    }
-
-    public void setAssignees(List<User> assignees) {
-        this.assignees = assignees;
-    }
-
-    public List<User> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<User> participants) {
-        this.participants = participants;
-    }
-
-    public List<Label> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(List<Label> labels) {
-        this.labels = labels;
-    }
+    public List<Label> getLabels() { return labels; }
+    public void setLabels(List<Label> labels) { this.labels = labels; }
 }

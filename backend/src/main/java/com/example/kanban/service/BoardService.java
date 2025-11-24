@@ -10,52 +10,51 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final ColumnRepository columnRepository;
+    private final TaskRepository taskRepository;
     private final TaskAssigneeRepository taskAssigneeRepository;
     private final TaskParticipantRepository taskParticipantRepository;
     private final TaskLabelRepository taskLabelRepository;
 
     public BoardService(BoardRepository boardRepository,
+                        ColumnRepository columnRepository,
+                        TaskRepository taskRepository,
                         TaskAssigneeRepository taskAssigneeRepository,
                         TaskParticipantRepository taskParticipantRepository,
                         TaskLabelRepository taskLabelRepository) {
         this.boardRepository = boardRepository;
+        this.columnRepository = columnRepository;
+        this.taskRepository = taskRepository;
         this.taskAssigneeRepository = taskAssigneeRepository;
         this.taskParticipantRepository = taskParticipantRepository;
         this.taskLabelRepository = taskLabelRepository;
     }
 
+    public List<Board> getBoardsByOwner(long ownerId) throws SQLException {
+        return boardRepository.findBoardsByOwner(ownerId);
+    }
+
     public BoardView getBoardView(long boardId, long userId) throws SQLException, IllegalAccessException {
         Board board = boardRepository.findBoardById(boardId);
-        if (board == null) {
-            throw new NoSuchElementException("Board not found");
-        }
+        if (board == null) throw new NoSuchElementException("Board not found");
+        if (board.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
 
-        // пока без сложной проверки прав — просто владелец
-        if (board.getOwnerId() != userId) {
-            throw new IllegalAccessException("Access denied");
-        }
+        List<Column> columns = columnRepository.findByBoardId(boardId);
+        // все задачи этого борда
+        List<Task> tasks = taskRepository.findByBoardId(boardId); // нужно добавить метод в TaskRepository
 
-        List<Column> columns = boardRepository.findColumnsByBoard(boardId);
-        List<Task> tasks = boardRepository.findTasksByBoard(boardId);
-
-        List<Long> taskIds = tasks.stream()
-                .map(Task::getId)
-                .collect(Collectors.toList());
-
+        List<Long> taskIds = tasks.stream().map(Task::getId).collect(Collectors.toList());
         Map<Long, List<User>> assigneesByTask = taskAssigneeRepository.findUsersByTaskIds(taskIds);
         Map<Long, List<User>> participantsByTask = taskParticipantRepository.findUsersByTaskIds(taskIds);
         Map<Long, List<Label>> labelsByTask = taskLabelRepository.findLabelsByTaskIds(taskIds);
 
-        // группируем задачи по колонкам
-        Map<Long, List<Task>> tasksByColumnId = tasks.stream()
+        Map<Long, List<Task>> tasksByColumn = tasks.stream()
                 .collect(Collectors.groupingBy(Task::getColumnId));
 
         List<BoardColumnView> columnViews = new ArrayList<>();
-
         for (Column c : columns) {
-            List<Task> colTasks = tasksByColumnId.getOrDefault(c.getId(), List.of());
-            List<TaskView> taskViews = new ArrayList<>();
-
+            List<Task> colTasks = tasksByColumn.getOrDefault(c.getId(), List.of());
+            List<TaskView> tvList = new ArrayList<>();
             for (Task t : colTasks) {
                 TaskView tv = new TaskView();
                 tv.setId(t.getId());
@@ -67,21 +66,17 @@ public class BoardService {
                 tv.setDueDate(t.getDueDate());
                 tv.setCreatedAt(t.getCreatedAt());
                 tv.setUpdatedAt(t.getUpdatedAt());
-
                 tv.setAssignees(assigneesByTask.getOrDefault(t.getId(), List.of()));
                 tv.setParticipants(participantsByTask.getOrDefault(t.getId(), List.of()));
                 tv.setLabels(labelsByTask.getOrDefault(t.getId(), List.of()));
-
-                taskViews.add(tv);
+                tvList.add(tv);
             }
-
             BoardColumnView cv = new BoardColumnView();
             cv.setId(c.getId());
             cv.setBoardId(c.getBoardId());
             cv.setTitle(c.getTitle());
             cv.setPosition(c.getPosition());
-            cv.setTasks(taskViews);
-
+            cv.setTasks(tvList);
             columnViews.add(cv);
         }
 
@@ -95,5 +90,50 @@ public class BoardService {
         view.setColumns(columnViews);
 
         return view;
+    }
+
+    public Board createBoard(long ownerId, String title, String description) throws SQLException {
+        return boardRepository.createBoard(ownerId, title, description);
+    }
+
+    public Board updateBoard(long boardId, long userId, String title, String description)
+            throws SQLException, IllegalAccessException {
+        Board existing = boardRepository.findBoardById(boardId);
+        if (existing == null) throw new NoSuchElementException("Board not found");
+        if (existing.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
+        return boardRepository.updateBoard(boardId, title, description);
+    }
+
+    public void deleteBoard(long boardId, long userId) throws SQLException, IllegalAccessException {
+        Board existing = boardRepository.findBoardById(boardId);
+        if (existing == null) return;
+        if (existing.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
+        boardRepository.deleteBoard(boardId);
+    }
+
+    public Column createColumn(long boardId, long userId, String title, int position)
+            throws SQLException, IllegalAccessException {
+        Board board = boardRepository.findBoardById(boardId);
+        if (board == null) throw new NoSuchElementException("Board not found");
+        if (board.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
+        return columnRepository.createColumn(boardId, title, position);
+    }
+
+    public Column updateColumn(long columnId, long userId, String title, Integer position)
+            throws SQLException, IllegalAccessException {
+        Column c = columnRepository.findById(columnId);
+        if (c == null) throw new NoSuchElementException("Column not found");
+        Board board = boardRepository.findBoardById(c.getBoardId());
+        if (board == null || board.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
+        return columnRepository.updateColumn(columnId, title, position);
+    }
+
+    public void deleteColumn(long columnId, long userId)
+            throws SQLException, IllegalAccessException {
+        Column c = columnRepository.findById(columnId);
+        if (c == null) return;
+        Board board = boardRepository.findBoardById(c.getBoardId());
+        if (board == null || board.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
+        columnRepository.deleteColumn(columnId);
     }
 }
