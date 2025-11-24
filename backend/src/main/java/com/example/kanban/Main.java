@@ -3,8 +3,11 @@ package com.example.kanban;
 import com.example.kanban.config.AppConfig;
 import com.example.kanban.db.ConnectionManager;
 import com.example.kanban.http.Router;
-import com.example.kanban.repository.UserRepository;
+import com.example.kanban.http.handlers.AuthHandler;
+import com.example.kanban.http.handlers.BoardHandler;
+import com.example.kanban.repository.*;
 import com.example.kanban.service.AuthService;
+import com.example.kanban.service.BoardService;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
@@ -12,23 +15,34 @@ import java.net.InetSocketAddress;
 import java.util.logging.Logger;
 
 public class Main {
-    private static final Logger log = Logger.getLogger(Main.class.getName());
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         AppConfig config = new AppConfig();
         ConnectionManager cm = new ConnectionManager(config);
 
+        // Репозитории
         UserRepository userRepo = new UserRepository(cm);
-        AuthService authService = new AuthService(userRepo, cm);
+        SessionRepository sessionRepo = new SessionRepository(cm);
+        BoardRepository boardRepo = new BoardRepository(cm);
+        TaskAssigneeRepository assigneeRepo = new TaskAssigneeRepository(cm);
+        TaskParticipantRepository participantRepo = new TaskParticipantRepository(cm);
+        TaskLabelRepository labelRepo = new TaskLabelRepository(cm);
 
-        int port = config.getServerPort();
-        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        // Сервисы
+        AuthService authService = new AuthService(userRepo, sessionRepo);
+        BoardService boardService = new BoardService(
+                boardRepo, assigneeRepo, participantRepo, labelRepo
+        );
 
-        Router router = new Router(server, authService, cm);
-        router.registerRoutes();
+        // HTTP-сервер
+        HttpServer server = HttpServer.create(new InetSocketAddress(config.getServerPort()), 0);
 
-        server.setExecutor(null); // default executor
-        log.info("Server started on port " + port);
+        server.createContext("/api/auth", new AuthHandler(authService));
+        server.createContext("/api/boards", new BoardHandler(authService, boardService));
+
+        server.setExecutor(null);
         server.start();
+
+        System.out.println("Server started on port " + config.getServerPort());
     }
 }
+

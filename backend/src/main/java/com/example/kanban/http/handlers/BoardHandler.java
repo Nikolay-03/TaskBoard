@@ -1,46 +1,42 @@
 package com.example.kanban.http.handlers;
 
-import com.example.kanban.db.ConnectionManager;
 import com.example.kanban.http.JsonUtils;
-import com.example.kanban.model.Board;
-import com.example.kanban.model.Column;
-import com.example.kanban.model.Task;
+import com.example.kanban.model.BoardView;
 import com.example.kanban.model.User;
-import com.example.kanban.repository.BoardRepository;
 import com.example.kanban.service.AuthService;
+import com.example.kanban.service.BoardService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
-import java.util.*;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class BoardHandler implements HttpHandler {
 
     private final AuthService authService;
-    private final BoardRepository boardRepo;
+    private final BoardService boardService;
 
-    public BoardHandler(AuthService authService, ConnectionManager cm) {
+    public BoardHandler(AuthService authService, BoardService boardService) {
         this.authService = authService;
-        this.boardRepo = new BoardRepository(cm);
+        this.boardService = boardService;
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
-        String path = exchange.getRequestURI().getPath(); // /api/boards or /api/boards/{id}
+        String path = exchange.getRequestURI().getPath(); // /api/boards или /api/boards/{id}
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
 
         try {
             if ("GET".equalsIgnoreCase(method)) {
-                // /api/boards/{id}
                 String[] parts = path.split("/");
+                // ожидаем /api/boards/{id}
                 if (parts.length == 4) {
                     long boardId = Long.parseLong(parts[3]);
                     handleGetBoard(exchange, boardId);
                 } else {
-                    // тут можно сделать список досок GET /api/boards
                     sendError(exchange, 404, "Not found");
                 }
             } else {
@@ -56,52 +52,17 @@ public class BoardHandler implements HttpHandler {
         User user = requireAuth(ex);
         if (user == null) return; // ответ уже отправлен
 
-        Board board = boardRepo.findBoardById(boardId);
-        if (board == null) {
-            sendError(ex, 404, "Board not found");
-            return;
-        }
+        try {
+            BoardView view = boardService.getBoardView(boardId, user.getId());
 
-        // TODO: проверка прав пользователя (owner или member) – отдельный репозиторий
-
-        List<Column> columns = boardRepo.findColumnsByBoard(boardId);
-        Map<Long, List<Task>> tasksByColumn = boardRepo.findTasksByBoardGrouped(boardId);
-
-        // собираем DTO
-        List<Map<String, Object>> columnsDto = new ArrayList<>();
-        for (Column c : columns) {
-            List<Task> tasks = tasksByColumn.getOrDefault(c.getId(), List.of());
-            List<Map<String, Object>> tasksDto = new ArrayList<>();
-            for (Task t : tasks) {
-                Map<String, Object> taskDto = new LinkedHashMap<>();
-                taskDto.put("id", t.getId());
-                taskDto.put("title", t.getTitle());
-                taskDto.put("description", t.getDescription());
-                taskDto.put("position", t.getPosition());
-                taskDto.put("columnId", t.getColumnId());
-                taskDto.put("dueDate", t.getDueDate() != null ? t.getDueDate().toString() : null);
-                // сюда же потом добавишь assignees, labels, participants
-                tasksDto.add(taskDto);
+            ex.sendResponseHeaders(200, 0);
+            try (OutputStream os = ex.getResponseBody()) {
+                JsonUtils.writeJson(os, view);
             }
-
-            Map<String, Object> columnDto = new LinkedHashMap<>();
-            columnDto.put("id", c.getId());
-            columnDto.put("title", c.getTitle());
-            columnDto.put("position", c.getPosition());
-            columnDto.put("tasks", tasksDto);
-
-            columnsDto.add(columnDto);
-        }
-
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("id", board.getId());
-        response.put("title", board.getTitle());
-        response.put("description", board.getDescription());
-        response.put("columns", columnsDto);
-
-        ex.sendResponseHeaders(200, 0);
-        try (OutputStream os = ex.getResponseBody()) {
-            JsonUtils.writeJson(os, response);
+        } catch (NoSuchElementException e) {
+            sendError(ex, 404, "Board not found");
+        } catch (IllegalAccessException e) {
+            sendError(ex, 403, "Access denied");
         }
     }
 
