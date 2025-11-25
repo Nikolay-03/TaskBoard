@@ -2,7 +2,7 @@
     import {dndzone} from 'svelte-dnd-action';
     import {BoardColumn} from "$lib/components";
     import {flip} from 'svelte/animate';
-    import type {IColumn} from "$lib/types/board";
+    import type {IColumn} from "$api/column";
 
     interface Props {
         columnItems: IColumn[]
@@ -22,13 +22,13 @@
 
     function handleDndConsiderCards(cid: number, e: CustomEvent) {
         const colIdx = columnItems.findIndex(c => c.id === cid);
-        columnItems[colIdx].items = e.detail.items;
+        columnItems[colIdx].tasks = e.detail.items;
         columnItems = [...columnItems];
     }
 
     function handleDndFinalizeCards(cid: number, e: CustomEvent) {
         const colIdx = columnItems.findIndex(c => c.id === cid);
-        columnItems[colIdx].items = e.detail.items;
+        columnItems[colIdx].tasks = e.detail.items;
         columnItems = [...columnItems];
     }
 </script>

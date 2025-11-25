@@ -1,9 +1,9 @@
 <script lang="ts">
     import {Card, CardHeader, CardTitle, CardContent} from '$lib/ui/card'
-    import type {IColumn} from "$lib/types/board";
     import {flip} from 'svelte/animate';
     import {dndzone} from 'svelte-dnd-action';
     import {AddTaskButton, BoardCard} from "$lib/components";
+    import type {IColumn} from "$api/column";
 
     interface Props {
         column: IColumn,
@@ -16,14 +16,14 @@
 </script>
 <Card class="h-full border-dashed border-2">
     <CardHeader>
-        <CardTitle class="text-center">{column.name}</CardTitle>
+        <CardTitle class="text-center">{column.title}</CardTitle>
     </CardHeader>
     <CardContent class="w-[350px] h-full px-3 flex flex-col gap-3">
         <div class="flex flex-col gap-3 min-h-5"
-             use:dndzone={{items: column.items, flipDurationMs, dropTargetClasses: ["!outline-none"]}}
+             use:dndzone={{items: column.tasks, flipDurationMs, dropTargetClasses: ["!outline-none"]}}
              on:consider={(e) => handleDndConsiderCards(column.id, e)}
              on:finalize={(e) => handleDndFinalizeCards(column.id, e)}>
-            {#each column.items as item (item.id)}
+            {#each column.tasks as item (item.id)}
                 <div animate:flip={{duration: flipDurationMs}}>
                     <BoardCard {...item}/>
                 </div>

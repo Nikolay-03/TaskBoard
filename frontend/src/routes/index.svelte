@@ -1,38 +1,31 @@
 <script lang="ts">
-import {Board} from "$lib/components";
-import type {IColumn} from "$lib/types/board";
-let board: IColumn[] = [
-    {
-        id: 1,
-        name: "TODO",
-        items: [
-            {id: 41, title: "task", description: "description"},
-            {id: 42, title: "item42", description: "description"},
-            {id: 43, title: "item43", description: "description"},
-        ]
-    },
-    {
-        id: 2,
-        name: "IN PROGRESS",
-        items: [
-            {id: 44, title: "item44", description: "description"},
-            {id: 45, title: "item45", description: "description"},
-            {id: 46, title: "item46", description: "description"},
-            {id: 47, title: "item47", description: "description"},
-        ]
-    },
-    {
-        id: 3,
-        name: "DONE",
-        items: [
-            {id: 48, title: "item48", description: "description"},
-            {id: 49, title: "item49", description: "description"}
-        ]
-    },
-];
-let boardColumns = $state(board);
+    import {Board} from "$lib/components";
+    import {api} from "$api/index";
+    import type {IBoard} from "$api/board";
+    import {Spinner} from "$lib/ui/spinner";
+
+    let loading = $state(false);
+    let data = $state<IBoard | null>();
+    let error = $state();
+    $effect(() => {
+        loading = true;
+        data = null;
+        error = null;
+        (async () => {
+            const res = await api.get<IBoard>('/boards/1')
+            loading = false;
+            data = res;
+        })();
+    })
+    let boardColumns = $derived(data?.columns);
 </script>
 <div class="flex flex-col gap-5 flex-1">
-    <h1 class="font-semibold text-2xl">Board</h1>
-    <Board columnItems={boardColumns}/>
+    <h1 class="font-semibold text-2xl">{data?.title}</h1>
+    {#if loading}
+        <div class="flex flex-col items-center justify-center h-full w-full">
+            <Spinner class="size-15"/>
+        </div>
+        {:else if boardColumns}
+        <Board columnItems={boardColumns}/>
+    {/if}
 </div>
