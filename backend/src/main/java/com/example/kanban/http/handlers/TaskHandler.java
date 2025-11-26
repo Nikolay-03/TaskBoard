@@ -1,9 +1,7 @@
 package com.example.kanban.http.handlers;
 
 import com.example.kanban.http.JsonUtils;
-import com.example.kanban.model.Column;
-import com.example.kanban.model.Task;
-import com.example.kanban.model.User;
+import com.example.kanban.model.*;
 import com.example.kanban.repository.ColumnRepository;
 import com.example.kanban.repository.TaskAssigneeRepository;
 import com.example.kanban.repository.TaskLabelRepository;
@@ -16,6 +14,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 public class TaskHandler implements HttpHandler {
@@ -58,10 +57,10 @@ public class TaskHandler implements HttpHandler {
             // /api/tasks/{taskId}/labels[/{labelId}]
 
             if ("POST".equalsIgnoreCase(method)
-                    && parts.length == 5
+                    && parts.length == 4
                     && "api".equals(parts[1])
-                    && "columns".equals(parts[2])
-                    && "tasks".equals(parts[4])) {
+                    && "tasks".equals(parts[2])
+            ) {
                 long columnId = Long.parseLong(parts[3]);
                 handleCreateTaskInColumn(exchange, columnId);
 
@@ -79,58 +78,8 @@ public class TaskHandler implements HttpHandler {
                 long taskId = Long.parseLong(parts[3]);
                 handleDeleteTask(exchange, taskId);
 
-            } else if ("POST".equalsIgnoreCase(method)
-                    && parts.length == 5
-                    && "api".equals(parts[1])
-                    && "tasks".equals(parts[2])
-                    && "assignees".equals(parts[4])) {
-                long taskId = Long.parseLong(parts[3]);
-                handleAddAssignee(exchange, taskId);
-
-            } else if ("DELETE".equalsIgnoreCase(method)
-                    && parts.length == 6
-                    && "api".equals(parts[1])
-                    && "tasks".equals(parts[2])
-                    && "assignees".equals(parts[4])) {
-                long taskId = Long.parseLong(parts[3]);
-                long userId = Long.parseLong(parts[5]);
-                handleRemoveAssignee(exchange, taskId, userId);
-
-            } else if ("POST".equalsIgnoreCase(method)
-                    && parts.length == 5
-                    && "api".equals(parts[1])
-                    && "tasks".equals(parts[2])
-                    && "participants".equals(parts[4])) {
-                long taskId = Long.parseLong(parts[3]);
-                handleAddParticipant(exchange, taskId);
-
-            } else if ("DELETE".equalsIgnoreCase(method)
-                    && parts.length == 6
-                    && "api".equals(parts[1])
-                    && "tasks".equals(parts[2])
-                    && "participants".equals(parts[4])) {
-                long taskId = Long.parseLong(parts[3]);
-                long userId = Long.parseLong(parts[5]);
-                handleRemoveParticipant(exchange, taskId, userId);
-
-            } else if ("POST".equalsIgnoreCase(method)
-                    && parts.length == 5
-                    && "api".equals(parts[1])
-                    && "tasks".equals(parts[2])
-                    && "labels".equals(parts[4])) {
-                long taskId = Long.parseLong(parts[3]);
-                handleAddLabel(exchange, taskId);
-
-            } else if ("DELETE".equalsIgnoreCase(method)
-                    && parts.length == 6
-                    && "api".equals(parts[1])
-                    && "tasks".equals(parts[2])
-                    && "labels".equals(parts[4])) {
-                long taskId = Long.parseLong(parts[3]);
-                long labelId = Long.parseLong(parts[5]);
-                handleRemoveLabel(exchange, taskId, labelId);
-
-            } else {
+            }
+            else {
                 sendError(exchange, 404, "Not found");
             }
 
@@ -162,17 +111,33 @@ public class TaskHandler implements HttpHandler {
                 ? LocalDate.parse(req.dueDate)
                 : null;
 
-        int position = (req.position != null) ? req.position : 1;
 
         Task t = taskRepository.createTask(
                 column.getBoardId(),
                 columnId,
                 req.title,
                 req.description,
-                position,
                 dueDate
         );
-
+        long taskId = t.getId();
+        if (req.assignees != null) {
+            for (long assigneeId : req.assignees) {
+                assigneeRepository.addAssignee(taskId, assigneeId);
+            }
+            t.setAssignees(assigneeRepository.getAssigneesByTaskId(taskId));
+        }
+        if (req.labels != null) {
+            for (long labelId : req.labels) {
+                taskLabelRepository.addLabelToTask(taskId, labelId);
+            }
+            t.setLabels(taskLabelRepository.getLabelsByTaskId(taskId));
+        }
+        if (req.participants != null) {
+            for (long participantId : req.participants) {
+                participantRepository.addParticipant(taskId, participantId);
+            }
+            t.setParticipants(participantRepository.getParticipantsByTaskId(taskId));
+        }
         ex.sendResponseHeaders(201, 0);
         try (OutputStream os = ex.getResponseBody()) {
             JsonUtils.writeJson(os, t);
@@ -203,6 +168,24 @@ public class TaskHandler implements HttpHandler {
                 req.position,
                 dueDate
         );
+        if (req.assignees != null) {
+            for (long assigneeId : req.assignees) {
+                assigneeRepository.addAssignee(taskId, assigneeId);
+            }
+            t.setAssignees(assigneeRepository.getAssigneesByTaskId(taskId));
+        }
+        if (req.labels != null) {
+            for (long labelId : req.labels) {
+                taskLabelRepository.addLabelToTask(taskId, labelId);
+            }
+            t.setLabels(taskLabelRepository.getLabelsByTaskId(taskId));
+        }
+        if (req.participants != null) {
+            for (long participantId : req.participants) {
+                participantRepository.addParticipant(taskId, participantId);
+            }
+            t.setParticipants(participantRepository.getParticipantsByTaskId(taskId));
+        }
         if (t == null) {
             sendError(ex, 404, "Task not found");
             return;
@@ -223,80 +206,6 @@ public class TaskHandler implements HttpHandler {
         taskRepository.deleteTask(taskId);
         ex.sendResponseHeaders(204, -1);
     }
-
-    // ---------- assignees ----------
-
-    private void handleAddAssignee(HttpExchange ex, long taskId) throws Exception {
-        User user = requireAuth(ex);
-        if (user == null) return;
-
-        UserIdRequest req = JsonUtils.readJson(ex.getRequestBody(), UserIdRequest.class);
-        if (req == null || req.userId == null) {
-            sendError(ex, 400, "Invalid request");
-            return;
-        }
-
-        assigneeRepository.addAssignee(taskId, req.userId);
-        ex.sendResponseHeaders(204, -1);
-    }
-
-    private void handleRemoveAssignee(HttpExchange ex, long taskId, long userId) throws Exception {
-        User user = requireAuth(ex);
-        if (user == null) return;
-
-        assigneeRepository.removeAssignee(taskId, userId);
-        ex.sendResponseHeaders(204, -1);
-    }
-
-    // ---------- participants ----------
-
-    private void handleAddParticipant(HttpExchange ex, long taskId) throws Exception {
-        User user = requireAuth(ex);
-        if (user == null) return;
-
-        UserIdRequest req = JsonUtils.readJson(ex.getRequestBody(), UserIdRequest.class);
-        if (req == null || req.userId == null) {
-            sendError(ex, 400, "Invalid request");
-            return;
-        }
-
-        participantRepository.addParticipant(taskId, req.userId);
-        ex.sendResponseHeaders(204, -1);
-    }
-
-    private void handleRemoveParticipant(HttpExchange ex, long taskId, long userId) throws Exception {
-        User user = requireAuth(ex);
-        if (user == null) return;
-
-        participantRepository.removeParticipant(taskId, userId);
-        ex.sendResponseHeaders(204, -1);
-    }
-
-    // ---------- labels ----------
-
-    private void handleAddLabel(HttpExchange ex, long taskId) throws Exception {
-        User user = requireAuth(ex);
-        if (user == null) return;
-
-        LabelIdRequest req = JsonUtils.readJson(ex.getRequestBody(), LabelIdRequest.class);
-        if (req == null || req.labelId == null) {
-            sendError(ex, 400, "Invalid request");
-            return;
-        }
-
-        taskLabelRepository.addLabelToTask(taskId, req.labelId);
-        ex.sendResponseHeaders(204, -1);
-    }
-
-    private void handleRemoveLabel(HttpExchange ex, long taskId, long labelId) throws Exception {
-        User user = requireAuth(ex);
-        if (user == null) return;
-
-        taskLabelRepository.removeLabelFromTask(taskId, labelId);
-        ex.sendResponseHeaders(204, -1);
-    }
-
-    // ---------- helpers ----------
 
     private User requireAuth(HttpExchange ex) throws IOException {
         String sessionId = ex.getRequestHeaders().getFirst("X-Session-Id");
@@ -345,6 +254,9 @@ public class TaskHandler implements HttpHandler {
         public String description;
         public Integer position;
         public String dueDate; // yyyy-MM-dd
+        public List<Long> labels;
+        public List<Long> participants;
+        public List<Long> assignees;
     }
 
     public static class UpdateTaskRequest {
@@ -352,14 +264,10 @@ public class TaskHandler implements HttpHandler {
         public String title;
         public String description;
         public Integer position;
-        public String dueDate; // yyyy-MM-dd
+        public String dueDate;
+        public List<Long> labels;
+        public List<Long> participants;
+        public List<Long> assignees;
     }
 
-    public static class UserIdRequest {
-        public Long userId;
-    }
-
-    public static class LabelIdRequest {
-        public Long labelId;
-    }
 }

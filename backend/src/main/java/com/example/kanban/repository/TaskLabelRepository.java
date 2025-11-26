@@ -30,14 +30,14 @@ public class TaskLabelRepository {
 
         StringBuilder sb = new StringBuilder();
         sb.append("""
-            SELECT tl.task_id,
-                   l.id,
-                   l.name,
-                   l.color
-            FROM task_labels tl
-            JOIN labels l ON l.id = tl.label_id
-            WHERE tl.task_id IN (
-        """);
+                    SELECT tl.task_id,
+                           l.id,
+                           l.name,
+                           l.color
+                    FROM task_labels tl
+                    JOIN labels l ON l.id = tl.label_id
+                    WHERE tl.task_id IN (
+                """);
         for (int i = 0; i < taskIds.size(); i++) {
             if (i > 0) sb.append(",");
             sb.append("?");
@@ -67,6 +67,24 @@ public class TaskLabelRepository {
             }
         }
 
+        return result;
+    }
+
+    public List<Label> getLabelsByTaskId(Long taskId) throws SQLException {
+        List<Label> result = new ArrayList<>();
+        String sql = "SELECT * FROM task_labels JOIN labels ON task_labels.label_id = labels.id WHERE task_id = ?";
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, taskId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Label label = new Label();
+                label.setId(rs.getLong("id"));
+                label.setName(rs.getString("name"));
+                label.setColor(rs.getString("color"));
+                result.add(label);
+            }
+        }
         return result;
     }
 

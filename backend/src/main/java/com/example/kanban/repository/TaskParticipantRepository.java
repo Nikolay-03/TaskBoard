@@ -1,6 +1,7 @@
 package com.example.kanban.repository;
 
 import com.example.kanban.db.ConnectionManager;
+import com.example.kanban.model.TaskParticipant;
 import com.example.kanban.model.User;
 
 import java.sql.*;
@@ -29,14 +30,14 @@ public class TaskParticipantRepository {
 
         StringBuilder sb = new StringBuilder();
         sb.append("""
-            SELECT tp.task_id,
-                   u.id   AS user_id,
-                   u.email,
-                   u.name
-            FROM task_participants tp
-            JOIN users u ON u.id = tp.user_id
-            WHERE tp.task_id IN (
-        """);
+                    SELECT tp.task_id,
+                           u.id   AS user_id,
+                           u.email,
+                           u.name
+                    FROM task_participants tp
+                    JOIN users u ON u.id = tp.user_id
+                    WHERE tp.task_id IN (
+                """);
         for (int i = 0; i < taskIds.size(); i++) {
             if (i > 0) sb.append(",");
             sb.append("?");
@@ -66,6 +67,23 @@ public class TaskParticipantRepository {
             }
         }
 
+        return result;
+    }
+
+    public List<TaskParticipant> getParticipantsByTaskId(Long taskId) throws SQLException {
+        List<TaskParticipant> result = new ArrayList<>();
+        String sql = "SELECT * FROM task_participants WHERE task_id = ?";
+        try (Connection con = cm.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, taskId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                TaskParticipant participant = new TaskParticipant();
+                participant.setTaskId(rs.getLong("task_id"));
+                participant.setUserId(rs.getLong("user_id"));
+                result.add(participant);
+            }
+
+        }
         return result;
     }
 

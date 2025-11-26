@@ -18,11 +18,11 @@ public class TaskRepository {
 
     public Task findById(long taskId) throws SQLException {
         String sql = """
-            SELECT id, board_id, column_id, title, description, position,
-                   due_date, created_at, updated_at
-            FROM tasks
-            WHERE id = ?
-            """;
+                SELECT id, board_id, column_id, title, description, position,
+                       due_date, created_at, updated_at
+                FROM tasks
+                WHERE id = ?
+                """;
         try (Connection con = cm.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, taskId);
@@ -43,14 +43,15 @@ public class TaskRepository {
             }
         }
     }
+
     public List<Task> findByBoardId(long boardId) throws SQLException {
         String sql = """
-            SELECT id, board_id, column_id, title, description, position,
-                   due_date, created_at, updated_at
-            FROM tasks
-            WHERE board_id = ?
-            ORDER BY column_id, position
-            """;
+                SELECT id, board_id, column_id, title, description, position,
+                       due_date, created_at, updated_at
+                FROM tasks
+                WHERE board_id = ?
+                ORDER BY column_id, position
+                """;
         List<Task> list = new ArrayList<>();
         try (Connection con = cm.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -74,29 +75,44 @@ public class TaskRepository {
         }
         return list;
     }
-    public Task createTask(long boardId, long columnId, String title, String description,
-                           int position, LocalDate dueDate) throws SQLException {
+
+    private int getNextPosition(Connection con, long columnId) throws SQLException {
+        String sql = "SELECT COALESCE(MAX(position), 0) + 1 AS next_pos FROM tasks WHERE column_id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, columnId);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getInt("next_pos");
+            }
+        }
+    }
+
+    public Task createTask(long boardId, long columnId, String title, String description, LocalDate dueDate) throws SQLException {
+
         String sql = """
-            INSERT INTO tasks(board_id, column_id, title, description, position, due_date)
+            INSERT INTO tasks (board_id, column_id, title, description, position, due_date)
             VALUES (?, ?, ?, ?, ?, ?)
-            RETURNING id, board_id, column_id, title, description, position,
-                      due_date, created_at, updated_at
-            """;
+            RETURNING id, board_id, column_id, title, description, position, created_at, updated_at, due_date
+        """;
+
         try (Connection con = cm.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
+            int nextPos = getNextPosition(con, columnId);
+
             ps.setLong(1, boardId);
             ps.setLong(2, columnId);
             ps.setString(3, title);
             ps.setString(4, description);
-            ps.setInt(5, position);
+            ps.setInt(5, nextPos);
             if (dueDate != null) {
                 ps.setDate(6, java.sql.Date.valueOf(dueDate));
             } else {
                 ps.setNull(6, Types.DATE);
             }
-
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
+                if (!rs.next()) {
+                    throw new SQLException("Failed to insert task");
+                }
                 Task t = new Task();
                 t.setId(rs.getLong("id"));
                 t.setBoardId(rs.getLong("board_id"));
@@ -104,10 +120,12 @@ public class TaskRepository {
                 t.setTitle(rs.getString("title"));
                 t.setDescription(rs.getString("description"));
                 t.setPosition(rs.getInt("position"));
-                java.sql.Date due = rs.getDate("due_date");
-                if (due != null) t.setDueDate(due.toLocalDate());
                 t.setCreatedAt(rs.getTimestamp("created_at").toInstant());
                 t.setUpdatedAt(rs.getTimestamp("updated_at").toInstant());
+                java.sql.Date due = rs.getDate("due_date");
+                if (due != null) {
+                    t.setDueDate(due.toLocalDate());
+                }
                 return t;
             }
         }
@@ -116,12 +134,12 @@ public class TaskRepository {
     public Task updateTask(long taskId, long columnId, String title, String description,
                            int position, LocalDate dueDate) throws SQLException {
         String sql = """
-            UPDATE tasks
-            SET column_id = ?, title = ?, description = ?, position = ?, due_date = ?, updated_at = now()
-            WHERE id = ?
-            RETURNING id, board_id, column_id, title, description, position,
-                      due_date, created_at, updated_at
-            """;
+                UPDATE tasks
+                SET column_id = ?, title = ?, description = ?, position = ?, due_date = ?, updated_at = now()
+                WHERE id = ?
+                RETURNING id, board_id, column_id, title, description, position,
+                          due_date, created_at, updated_at
+                """;
         try (Connection con = cm.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, columnId);

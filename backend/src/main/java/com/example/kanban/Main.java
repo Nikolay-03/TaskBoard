@@ -4,9 +4,7 @@ import com.example.kanban.config.AppConfig;
 import com.example.kanban.db.ConnectionManager;
 import com.example.kanban.http.CorsFilter;
 import com.example.kanban.http.Router;
-import com.example.kanban.http.handlers.AuthHandler;
-import com.example.kanban.http.handlers.BoardHandler;
-import com.example.kanban.http.handlers.TaskHandler;
+import com.example.kanban.http.handlers.*;
 import com.example.kanban.repository.*;
 import com.example.kanban.service.AuthService;
 import com.example.kanban.service.BoardService;
@@ -47,6 +45,8 @@ public class Main {
 
         // HTTP-сервер
         HttpServer server = HttpServer.create(new InetSocketAddress(config.getServerPort()), 0);
+        server.createContext("/openapi.yaml", new OpenApiHandler());
+        server.createContext("/swagger", new SwaggerUiHandler());
 
         var authContext = server.createContext("/api/auth", new AuthHandler(authService));
         var boardsContext = server.createContext("/api/boards", new BoardHandler(authService, boardService));
