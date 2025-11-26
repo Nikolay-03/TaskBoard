@@ -1,5 +1,3 @@
-import Board from './Board.svelte';
-import BoardColumn from "./BoardColumn.svelte";
-import BoardCard from "./BoardCard.svelte";
-import AddTaskButton from "./AddTaskButton.svelte";
-export { Board, BoardColumn, BoardCard, AddTaskButton };
+export {default as Board} from './Board.svelte';
+export {default as BoardColumn} from "./BoardColumn.svelte";
+export {default as BoardCard} from "./BoardCard.svelte";
