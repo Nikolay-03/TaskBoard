@@ -47,6 +47,7 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(config.getServerPort()), 0);
         server.createContext("/openapi.yaml", new OpenApiHandler());
         server.createContext("/swagger", new SwaggerUiHandler());
+        server.createContext("/api/labels", new LabelHandler(authService, labelRepo));
 
         var authContext = server.createContext("/api/auth", new AuthHandler(authService));
         var boardsContext = server.createContext("/api/boards", new BoardHandler(authService, boardService));

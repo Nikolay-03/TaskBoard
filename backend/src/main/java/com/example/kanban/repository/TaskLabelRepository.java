@@ -97,15 +97,23 @@ public class TaskLabelRepository {
             ps.executeUpdate();
         }
     }
+    public List<Label> findAll() throws SQLException {
+        String sql = "SELECT id, name, color FROM labels ORDER BY id";
+        List<Label> list = new ArrayList<>();
 
-    public void removeLabelFromTask(long taskId, long labelId) throws SQLException {
-        String sql = "DELETE FROM task_labels WHERE task_id = ? AND label_id = ?";
         try (Connection con = cm.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, taskId);
-            ps.setLong(2, labelId);
-            ps.executeUpdate();
-        }
-    }
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
+            while (rs.next()) {
+                Label l = new Label();
+                l.setId(rs.getLong("id"));
+                l.setName(rs.getString("name"));
+                l.setColor(rs.getString("color"));
+                list.add(l);
+            }
+        }
+
+        return list;
+    }
 }
