@@ -1,0 +1,467 @@
+openapi: 3.0.3
+info:
+  title: Kanban Board API
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/auth/register:
+    post:
+      summary: Регистрация пользователя
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                  email:
+                    type: string
+                    format: email
+                  name:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/auth/login:
+    post:
+      summary: Логин
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Успешный вход
+          headers:
+            X-Session-Id:
+              description: Идентификатор сессии
+              schema:
+                type: string
+            Set-Cookie:
+              description: Cookie с SESSION_ID
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  sessionId:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/auth/me:
+    get:
+      summary: Текущий пользователь по сессии
+      tags: [Auth]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Текущий пользователь
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/auth/logout:
+    post:
+      summary: Выход из системы
+      tags: [Auth]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      responses:
+        '204':
+          description: Успешный выход (без тела)
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/boards/{boardId}:
+    get:
+      summary: Получить доску с колонками и задачами
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Представление доски
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardView'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Доска не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/tasks/{columnId}:
+    post:
+      summary: Создать задачу в столбце
+      tags: [Tasks]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: columnId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Задача создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Колонка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/tasks/{taskId}:
+    patch:
+      summary: Обновить задачу
+      tags: [Tasks]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Задача обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Задача не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Удалить задачу
+      tags: [Tasks]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Задача удалена
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    SessionHeader:
+      type: apiKey
+      in: header
+      name: X-Session-Id
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: SESSION_ID
+
+  responses:
+    BadRequest:
+      description: Неверный запрос
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Требуется аутентификация
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        name:
+          type: string
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    CreateTaskRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        position:
+          type: integer
+          format: int32
+          nullable: true
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+        labels:
+          type: array
+          items:
+            type: integer
+            format: int64
+        participants:
+          type: array
+          items:
+            type: integer
+            format: int64
+        assignees:
+          type: array
+          items:
+            type: integer
+            format: int64
+
+    UpdateTaskRequest:
+      type: object
+      required: [columnId, title, position]
+      properties:
+        columnId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        position:
+          type: integer
+          format: int32
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+        labels:
+          type: array
+          items:
+            type: integer
+            format: int64
+        participants:
+          type: array
+          items:
+            type: integer
+            format: int64
+        assignees:
+          type: array
+          items:
+            type: integer
+            format: int64
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        boardId:
+          type: integer
+          format: int64
+        columnId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        position:
+          type: integer
+          format: int32
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskParticipant'
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskAssignee'
+
+    Label:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        color:
+          type: string
+
+    TaskAssignee:
+      type: object
+      properties:
+        taskId:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+
+    TaskParticipant:
+      type: object
+      properties:
+        taskId:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+
+    BoardView:
+      type: object
+      description: >
+        Полное представление доски (структура зависит от реализации BoardView на бэкенде).
+        Здесь описан как "произвольный объект".
+      additionalProperties: true
