@@ -9,8 +9,7 @@
         try {
             await logoutMutation.mutateAsync()
             navigate('/auth/login')
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e)
         }
     }

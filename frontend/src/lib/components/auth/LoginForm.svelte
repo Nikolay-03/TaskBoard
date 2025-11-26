@@ -30,7 +30,6 @@
             }
         }
     }
-    console.log(loginMutation.isError)
 </script>
 <Card class="w-[450px] gap-2">
     <CardHeader>
