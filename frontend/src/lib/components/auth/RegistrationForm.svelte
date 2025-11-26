@@ -7,6 +7,10 @@
     import {CardTitle} from "$lib/ui/card/index.js";
     import {Label} from "$lib/ui/label";
     import {EMAIL_PLACEHOLDER, PASSWORD_PLACEHOLDER} from "./constants";
+    import {useRegister} from "$api/auth";
+    import {navigate} from "sv-router/generated";
+
+    const registrationUser = useRegister()
     let email = $state('');
     let password = $state('');
     let name = $state('');
@@ -19,6 +23,12 @@
         }
         else {
             error = null
+            await registrationUser.mutateAsync({
+                name,
+                password,
+                email
+            })
+            navigate('/')
         }
     }
 </script>
@@ -47,7 +57,7 @@
             {/if}
             <div class="flex justify-between">
                 <span class="text-sm self-end">Already have an account? <a href="/auth/login" class="text-primary underline-offset-4 hover:underline"> Sign in</a></span>
-                <Button type="submit" class="w-fit">Sign up</Button>
+                <Button type="submit" class="w-fit" disabled={registrationUser.isPending}>Sign up</Button>
             </div>
         </form>
     </CardContent>
