@@ -2,8 +2,9 @@
     import {Card, CardHeader, CardTitle, CardContent} from '$lib/ui/card'
     import {flip} from 'svelte/animate';
     import {dndzone} from 'svelte-dnd-action';
-    import {AddTaskButton, BoardCard} from "$lib/components";
+    import {BoardCard} from "$lib/components/board";
     import type {IColumn} from "$api/column";
+    import {AddTaskButton} from "$lib/components/tasks";
 
     interface Props {
         column: IColumn,

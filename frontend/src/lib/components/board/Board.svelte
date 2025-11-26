@@ -1,6 +1,6 @@
 <script lang="ts">
     import {dndzone} from 'svelte-dnd-action';
-    import {BoardColumn} from "$lib/components";
+    import {BoardColumn} from "$lib/components/board";
     import {flip} from 'svelte/animate';
     import type {IColumn} from "$api/column";
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Board} from "$lib/components";
+    import {Board} from "$lib/components/board";
     import {useBoard} from "$api/board";
     import {Spinner} from "$lib/ui/spinner";
 
