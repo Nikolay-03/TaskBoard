@@ -51,6 +51,13 @@ public class AuthHandler implements HttpHandler {
         }
 
         User u = authService.register(req.email, req.password, req.name);
+
+        String sessionId = authService.createSession(u.getId());
+
+        ex.getResponseHeaders().add(
+                "Set-Cookie",
+                "SESSION_ID=" + sessionId + "; Path=/; HttpOnly"
+        );
         ex.sendResponseHeaders(201, 0);
         try (OutputStream os = ex.getResponseBody()) {
             JsonUtils.writeJson(os, Map.of(
@@ -76,9 +83,6 @@ public class AuthHandler implements HttpHandler {
 
         String sessionId = authService.createSession(u.getId());
 
-        // Вариант 1: header
-        ex.getResponseHeaders().add("X-Session-Id", sessionId);
-        // Вариант 2: cookie
         ex.getResponseHeaders().add(
                 "Set-Cookie",
                 "SESSION_ID=" + sessionId + "; Path=/; HttpOnly"
