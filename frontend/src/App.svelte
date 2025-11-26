@@ -1,6 +1,10 @@
 <script context="module">
-    import { Router } from 'sv-router';
+    import {QueryClient, QueryClientProvider} from '@tanstack/svelte-query'
+    import {Router} from 'sv-router';
     import 'sv-router/generated';
-</script>
 
-<Router />
+    const queryClient = new QueryClient()
+</script>
+<QueryClientProvider client={queryClient}>
+    <Router/>
+</QueryClientProvider>

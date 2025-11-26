@@ -2,6 +2,7 @@ package com.example.kanban;
 
 import com.example.kanban.config.AppConfig;
 import com.example.kanban.db.ConnectionManager;
+import com.example.kanban.http.CorsFilter;
 import com.example.kanban.http.Router;
 import com.example.kanban.http.handlers.AuthHandler;
 import com.example.kanban.http.handlers.BoardHandler;
@@ -47,9 +48,15 @@ public class Main {
         // HTTP-сервер
         HttpServer server = HttpServer.create(new InetSocketAddress(config.getServerPort()), 0);
 
-        server.createContext("/api/auth", new AuthHandler(authService));
-        server.createContext("/api/boards", new BoardHandler(authService, boardService));
-
+        var authContext = server.createContext("/api/auth", new AuthHandler(authService));
+        var boardsContext = server.createContext("/api/boards", new BoardHandler(authService, boardService));
+        var tasksContext = server.createContext("/api/tasks", taskHandler);
+        var columnsContext = server.createContext("/api/columns", taskHandler);
+        CorsFilter corsFilter = new CorsFilter();
+        authContext.getFilters().add(corsFilter);
+        boardsContext.getFilters().add(corsFilter);
+        tasksContext.getFilters().add(corsFilter);
+        columnsContext.getFilters().add(corsFilter);
         server.setExecutor(null);
         server.start();
 

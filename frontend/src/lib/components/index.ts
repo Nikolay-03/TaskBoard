@@ -5,4 +5,4 @@ import Navigation from './Navigation.svelte'
 import UserAvatar from './UserAvatar.svelte'
 import TaskModal from './TaskModal.svelte'
 export {Menu, ThemeSwitcher, LogoutButton, Navigation, UserAvatar, TaskModal}
-export * from './Board'
+export * from './board'

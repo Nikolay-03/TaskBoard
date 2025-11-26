@@ -21,11 +21,11 @@ export class Fetcher {
         });
 
         if (!res.ok) {
-            let message = `HTTP ${res.status}`;
+            let message;
             try {
                 const errBody = await res.json();
                 // если бэк отдает { error: "..." }
-                message += `: ${errBody.error ?? JSON.stringify(errBody)}`;
+                message = `${errBody.error ?? JSON.stringify(errBody)}`;
             } catch {
                 // игнор, если не json
             }
