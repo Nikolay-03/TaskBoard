@@ -1,8 +1,10 @@
 package com.example.kanban.http.handlers;
 
 import com.example.kanban.http.JsonUtils;
+import com.example.kanban.model.BoardMember;
 import com.example.kanban.model.BoardView;
 import com.example.kanban.model.User;
+import com.example.kanban.repository.BoardMemberRepository;
 import com.example.kanban.service.AuthService;
 import com.example.kanban.service.BoardService;
 import com.sun.net.httpserver.HttpExchange;
@@ -10,6 +12,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -26,21 +29,30 @@ public class BoardHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
-        String path = exchange.getRequestURI().getPath(); // /api/boards или /api/boards/{id}
+        String path = exchange.getRequestURI().getPath();
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
 
         try {
-            if ("GET".equalsIgnoreCase(method)) {
-                String[] parts = path.split("/");
-                // ожидаем /api/boards/{id}
-                if (parts.length == 4) {
+            String[] parts = path.split("/");
+            if ("GET".equalsIgnoreCase(method)
+                && parts.length == 4
+                && "api".equals(parts[1])
+                && "boards".equals(parts[2])
+            ) {
                     long boardId = Long.parseLong(parts[3]);
                     handleGetBoard(exchange, boardId);
-                } else {
-                    sendError(exchange, 404, "Not found");
-                }
-            } else {
-                sendError(exchange, 405, "Method not allowed");
+            } else if ("GET".equalsIgnoreCase(method)
+                    && parts.length == 5
+                    && "api".equals(parts[1])
+                    && "boards".equals(parts[2])
+                    && "members".equals(parts[4])
+            ) {
+                long boardId = Long.parseLong(parts[3]);
+                handleGetBoardMembers(exchange, boardId);
+
+            }
+            else {
+                sendError(exchange, 404, "Not found");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,6 +75,21 @@ public class BoardHandler implements HttpHandler {
             sendError(ex, 404, "Board not found");
         } catch (IllegalAccessException e) {
             sendError(ex, 403, "Access denied");
+        }
+    }
+
+    private void handleGetBoardMembers(HttpExchange ex, long boardId) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+        try {
+            List<BoardMember> members = boardService.getMembers(boardId);
+
+            ex.sendResponseHeaders(200, 0);
+            try (OutputStream os = ex.getResponseBody()) {
+                JsonUtils.writeJson(os, members);
+            }
+        } catch (NoSuchElementException e) {
+            sendError(ex, 404, "Board not found");
         }
     }
 

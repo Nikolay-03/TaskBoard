@@ -28,11 +28,12 @@ public class Main {
         TaskLabelRepository labelRepo = new TaskLabelRepository(cm);
         ColumnRepository columnRepo = new ColumnRepository(cm);
         TaskRepository taskRepo = new TaskRepository(cm);
+        BoardMemberRepository boardMemberRepo = new BoardMemberRepository(cm);
 
         // Сервисы
         AuthService authService = new AuthService(userRepo, sessionRepo);
         BoardService boardService = new BoardService(
-                boardRepo, columnRepo,taskRepo, assigneeRepo, participantRepo, labelRepo
+                boardRepo, columnRepo, taskRepo, assigneeRepo, participantRepo, labelRepo, boardMemberRepo
         );
         TaskHandler taskHandler = new TaskHandler(
                 authService,
@@ -47,14 +48,14 @@ public class Main {
         HttpServer server = HttpServer.create(new InetSocketAddress(config.getServerPort()), 0);
         server.createContext("/openapi.yaml", new OpenApiHandler());
         server.createContext("/swagger", new SwaggerUiHandler());
-        server.createContext("/api/labels", new LabelHandler(authService, labelRepo));
-
+        var labelsContext = server.createContext("/api/labels", new LabelHandler(authService, labelRepo));
         var authContext = server.createContext("/api/auth", new AuthHandler(authService));
         var boardsContext = server.createContext("/api/boards", new BoardHandler(authService, boardService));
         var tasksContext = server.createContext("/api/tasks", taskHandler);
         var columnsContext = server.createContext("/api/columns", taskHandler);
         CorsFilter corsFilter = new CorsFilter();
         authContext.getFilters().add(corsFilter);
+        labelsContext.getFilters().add(corsFilter);
         boardsContext.getFilters().add(corsFilter);
         tasksContext.getFilters().add(corsFilter);
         columnsContext.getFilters().add(corsFilter);

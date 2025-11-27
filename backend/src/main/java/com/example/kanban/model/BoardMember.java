@@ -3,8 +3,7 @@ package com.example.kanban.model;
 public class BoardMember {
     private long boardId;
     private long userId;
-    private String role;     // OWNER / MEMBER
-    private String userName; // чтобы не тащить отдельно User
+    private String userName;
     private String userEmail;
 
     public BoardMember() {
@@ -26,13 +25,6 @@ public class BoardMember {
         this.userId = userId;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 
     public String getUserName() {
         return userName;

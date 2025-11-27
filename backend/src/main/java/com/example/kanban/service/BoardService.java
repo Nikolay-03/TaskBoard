@@ -15,19 +15,21 @@ public class BoardService {
     private final TaskAssigneeRepository taskAssigneeRepository;
     private final TaskParticipantRepository taskParticipantRepository;
     private final TaskLabelRepository taskLabelRepository;
+    private final BoardMemberRepository boardMemberRepository;
 
     public BoardService(BoardRepository boardRepository,
                         ColumnRepository columnRepository,
                         TaskRepository taskRepository,
                         TaskAssigneeRepository taskAssigneeRepository,
                         TaskParticipantRepository taskParticipantRepository,
-                        TaskLabelRepository taskLabelRepository) {
+                        TaskLabelRepository taskLabelRepository, BoardMemberRepository boardMemberRepository) {
         this.boardRepository = boardRepository;
         this.columnRepository = columnRepository;
         this.taskRepository = taskRepository;
         this.taskAssigneeRepository = taskAssigneeRepository;
         this.taskParticipantRepository = taskParticipantRepository;
         this.taskLabelRepository = taskLabelRepository;
+        this.boardMemberRepository = boardMemberRepository;
     }
 
     public List<Board> getBoardsByOwner(long ownerId) throws SQLException {
@@ -135,5 +137,9 @@ public class BoardService {
         Board board = boardRepository.findBoardById(c.getBoardId());
         if (board == null || board.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
         columnRepository.deleteColumn(columnId);
+    }
+
+    public List<BoardMember> getMembers(long boardId) throws SQLException {
+        return boardMemberRepository.getMembersByBoardId(boardId);
     }
 }
