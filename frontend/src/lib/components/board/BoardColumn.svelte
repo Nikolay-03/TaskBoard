@@ -29,7 +29,7 @@
                     <BoardCard {...item}/>
                 </div>
             {/each}
-           <CreateTaskModal columnId={column.id}>
+           <CreateTaskModal columnId={column.id} boardId={column.boardId}>
                {#snippet trigger(props)}
                    <AddTaskButton {flipDurationMs} buttonProps={props}/>
                {/snippet}
