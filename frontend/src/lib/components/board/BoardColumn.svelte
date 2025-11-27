@@ -4,7 +4,7 @@
     import {dndzone} from 'svelte-dnd-action';
     import {BoardCard} from "$lib/components/board";
     import type {IColumn} from "$api/column";
-    import {AddTaskButton} from "$lib/components/tasks";
+    import {AddTaskButton, CreateTaskModal} from "$lib/components/tasks";
 
     interface Props {
         column: IColumn,
@@ -29,7 +29,11 @@
                     <BoardCard {...item}/>
                 </div>
             {/each}
-           <AddTaskButton {flipDurationMs}/>
+           <CreateTaskModal columnId={column.id}>
+               {#snippet trigger(props)}
+                   <AddTaskButton {flipDurationMs} buttonProps={props}/>
+               {/snippet}
+           </CreateTaskModal>
         </div>
     </CardContent>
 </Card>
