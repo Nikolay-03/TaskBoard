@@ -12,9 +12,10 @@
 
     interface Props {
         title: string;
-        value?:CalendarDate
-        placeholder?:string
+        value?: CalendarDate
+        placeholder?: string
     }
+
     let {value = $bindable(), placeholder = 'Select date', title}: Props = $props()
     const id = $props.id();
     let open = $state(false);
@@ -37,15 +38,15 @@
                 </Button>
             {/snippet}
         </PopoverTrigger>
-        <PopoverContent class="w-auto overflow-hidden p-0" align="start">
+        <PopoverContent class="w-auto overflow-hidden p-0" align="center">
             <Calendar
                     type="single"
                     bind:value
                     captionLayout="dropdown"
-                    onValueChange={(val) => {
-     open = false;
-    }}
-                    maxValue={today(getLocalTimeZone())}
+                    minValue={today(getLocalTimeZone())}
+                    onValueChange={() => {
+                        open = false;
+                    }}
             />
         </PopoverContent>
     </Popover>

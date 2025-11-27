@@ -16,3 +16,17 @@ export interface ITask {
     participants: IParticipant[]
     labels: ILabel[]
 }
+
+export interface ICreateTaskBody {
+    title: string
+    description: string
+    dueDate: string
+    labels: number[]
+    participants: number[]
+    assignees: number[]
+
+}
+export interface ICreateTaskVariables {
+    columnId: number;
+    body: ICreateTaskBody;
+};

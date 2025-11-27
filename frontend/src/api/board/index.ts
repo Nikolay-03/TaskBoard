@@ -1,6 +1,6 @@
 import {createQuery} from "@tanstack/svelte-query";
 import type {IBoard, IBoardMember} from "./board";
-import {api} from "$api/index";
+import {api} from "$api";
 
 export * from './board'
 export const useBoard = (id: number) => createQuery(() => ({

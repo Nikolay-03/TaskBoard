@@ -3,7 +3,7 @@
     import {type Snippet} from "svelte";
     import type {HTMLAttributes} from "svelte/elements";
     import {Spinner} from "$lib/ui/spinner";
-    import {api} from "$api/index";
+    import {api} from "$api";
     let {card}: { card: Snippet<[HTMLAttributes<HTMLDivElement>]> } = $props();
     let open = $state(false)
     let loading = $state(false);

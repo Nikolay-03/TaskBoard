@@ -1,5 +1,5 @@
 import {createQuery} from "@tanstack/svelte-query";
-import {api} from "$api/index";
+import {api} from "$api";
 import type {ILabel} from "$api/labels";
 
 export * from './label';

@@ -18,6 +18,7 @@
     "paths": {
       "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"],
+      "$api": ["src/api"],
       "$api/*": ["src/api/*"],
       "sv-router/generated": ["./.router/generated"]
     }
