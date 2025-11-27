@@ -5,10 +5,11 @@
     type Props = InputProps & {
         title: string
     }
-    let {title, value, ...inputProps}: Props = $props();
+    let {title, value = $bindable(), ...inputProps}: Props = $props();
+    const id = $props.id()
 </script>
 
 <div class="flex flex-col gap-2">
-    <Label for={title}>{title}</Label>
-    <Input id={title} bind:value {...inputProps}/>
+    <Label for={`${title}-${id}`}>{title}</Label>
+    <Input id={`${title}-${id}`} bind:value {...inputProps}/>
 </div>

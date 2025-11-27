@@ -7,7 +7,8 @@
     import AssigneesField from "./AssigneesField.svelte";
     import ParticipantsField from "./ParticipantsField.svelte";
     import LabelsField from "./LabelsField.svelte";
-    import {InputField} from "$lib/components/form";
+    import {DateField, InputField} from "$lib/components/form";
+    import type {CalendarDate} from "@internationalized/date";
 
     interface Props {
         trigger: Snippet<[ButtonProps]>,
@@ -20,7 +21,7 @@
     let assigneesModalOpen = $state<boolean>(false)
     let title = $state<string>('');
     let description = $state<string>('');
-    let dueDate = $state<string>('');
+    let dueDate = $state<CalendarDate>();
     let labels = $state<number[]>([]);
     let participants = $state<number[]>([]);
     let assignees = $state<number[]>([]);
@@ -29,9 +30,9 @@
     const labelsQuery = useLabels()
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault()
+        console.log(dueDate)
+        console.log(title)
         console.log($state.snapshot(labels))
-        console.log($state.snapshot(participants))
-        console.log($state.snapshot(assignees))
 
     }
     const handleLabelModalOpenChange = (open: boolean) => {
@@ -56,9 +57,9 @@
             <DialogTitle>Create task</DialogTitle>
         </DialogHeader>
         <form onsubmit={handleSubmit} class="flex flex-col gap-3">
-            <InputField title="Title" value={title} placeholder="Task Title"/>
-            <InputField title="Description" value={description} placeholder="TaskDescription"/>
-            <InputField title="Deadline date" value={dueDate} placeholder="Task deadline date" type="date"/>
+            <InputField title="Title" bind:value={title} placeholder="Task Title"/>
+            <InputField title="Description" bind:value={description} placeholder="TaskDescription"/>
+            <DateField title="Deadline date" bind:value={dueDate}/>
             <Button onclick={() => labelsModalOpen = true} variant="outline">
                 Select labels
             </Button>
