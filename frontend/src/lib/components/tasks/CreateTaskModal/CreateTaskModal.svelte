@@ -20,6 +20,8 @@
         columnId: number
         boardId: number
     }
+
+    let open = $state(false);
     let labelsModalOpen = $state<boolean>(false)
     let participantsModalOpen = $state<boolean>(false)
     let assigneesModalOpen = $state<boolean>(false)
@@ -49,12 +51,17 @@
             error = null
             try {
                 await createTaskMutation.mutateAsync({columnId, body:data});
+                onOpenChange(false)
                 await queryClient.invalidateQueries({queryKey: ['board', boardId]})
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : "";
                 toast.error(errorMessage)
             }
         }
+    }
+
+    const onOpenChange = (openVal: boolean) => {
+        open = openVal
     }
     const handleLabelModalOpenChange = (open: boolean) => {
         labelsModalOpen = open;
@@ -67,7 +74,7 @@
     };
 
 </script>
-<Dialog>
+<Dialog {open} {onOpenChange}>
     <DialogTrigger>
         {#snippet child({props})}
             {@render trigger(props)}
@@ -112,7 +119,7 @@
                 {#if error}
                     <div class="text-sm text-destructive" transition:fade>{error}</div>
                 {/if}
-                <Button type="submit" class="ml-auto" disabled={createTaskMutation.isPending}>
+                <Button type="submit" class="ml-auto" disabled={createTaskMutation.isLoading}>
                     Create
                 </Button>
             </div>

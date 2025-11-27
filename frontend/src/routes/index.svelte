@@ -4,10 +4,11 @@
     import {Spinner} from "$lib/ui/spinner";
 
     const board = useBoard(1);
+    $inspect(board.isLoading)
 </script>
 
 <div class="flex flex-col gap-5 flex-1">
-    {#if board.isPending}
+    {#if board.isLoading}
         <div class="flex flex-col items-center justify-center h-full w-full">
             <Spinner class="size-15" />
         </div>

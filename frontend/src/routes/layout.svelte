@@ -21,7 +21,7 @@
 <div class="bg-background h-dvh w-dvw p-4 flex gap-4">
     <ModeWatcher/>
     <Toaster/>
-    {#if userMutation.isPending}
+    {#if userMutation.isLoading}
         <div class="w-full h-full flex items-center justify-center">
             <Spinner class="size-15"/>
         </div>

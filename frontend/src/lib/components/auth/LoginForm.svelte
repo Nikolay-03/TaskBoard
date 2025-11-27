@@ -53,7 +53,7 @@
             <div class="flex justify-between">
                 <span class="text-sm self-end">Don't have an account? <a href="/auth/registration"
                                                                          class="text-primary underline-offset-4 hover:underline"> Sign up</a></span>
-                <Button type="submit" class="w-fit" disabled={loginMutation.isPending}>Sign in</Button>
+                <Button type="submit" class="w-fit" disabled={loginMutation.isLoading}>Sign in</Button>
             </div>
         </form>
     </CardContent>

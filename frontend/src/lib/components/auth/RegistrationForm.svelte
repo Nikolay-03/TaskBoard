@@ -57,7 +57,7 @@
             {/if}
             <div class="flex justify-between">
                 <span class="text-sm self-end">Already have an account? <a href="/auth/login" class="text-primary underline-offset-4 hover:underline"> Sign in</a></span>
-                <Button type="submit" class="w-fit" disabled={registrationUser.isPending}>Sign up</Button>
+                <Button type="submit" class="w-fit" disabled={registrationUser.isLoading}>Sign up</Button>
             </div>
         </form>
     </CardContent>
