@@ -16,3 +16,7 @@ export const useGetTask = (id: number) =>
 		queryFn: () => api.get<ITask>(`/tasks/${id}`),
 		enabled: false
 	}));
+export const useDeleteTask = (id: number) => createMutation(() => ({
+	mutationKey: ['task', id],
+	mutationFn: () => api.delete(`/tasks/${id}`),
+}))
