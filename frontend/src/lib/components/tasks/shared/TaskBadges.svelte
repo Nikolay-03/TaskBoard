@@ -1,5 +1,5 @@
 <script lang="ts">
-	import XIcon from '@lucide/svelte/icons/x';
+	import {XIcon} from '@lucide/svelte';
 	import { Badge, type BadgeVariant } from '$lib/ui/badge';
 	import { Button } from '$lib/ui/button';
 
