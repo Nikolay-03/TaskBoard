@@ -1,8 +1,6 @@
 <script lang="ts">
     import {CommandItem} from "$lib/ui/command";
-    import XIcon from "@lucide/svelte/icons/x";
     import {Badge} from "$lib/ui/badge";
-    import {Button} from "$lib/ui/button";
     import {MultiSelect} from "$lib/components";
     import type {IUser} from "$api/user";
     import {TaskBadges} from "$lib/components/tasks";

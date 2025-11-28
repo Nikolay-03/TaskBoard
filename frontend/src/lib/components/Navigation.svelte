@@ -18,7 +18,7 @@
 {/snippet}
 <nav>
     <ul class="flex flex-col gap-3">
-        {#each menuItems as item}
+        {#each menuItems as item (item.id)}
             {@render menuItem(item)}
         {/each}
     </ul>

@@ -6,7 +6,7 @@
     let {flipDurationMs, buttonProps}: { flipDurationMs: number, buttonProps: ButtonProps } = $props();
 </script>
 
-{#each [null] as _ (0)}
+{#each [null] as dummy (dummy)}
     <div animate:flip={{ duration: flipDurationMs }}>
         <Button class="text-base h-15 w-full" {...buttonProps}>
             <PlusIcon class="size-6"/>

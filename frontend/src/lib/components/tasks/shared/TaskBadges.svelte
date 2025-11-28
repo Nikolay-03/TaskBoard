@@ -1,6 +1,6 @@
 <script lang="ts">
+    import XIcon from '@lucide/svelte/icons/x'
     import {Badge, type BadgeVariant} from "$lib/ui/badge";
-    import XIcon from "@lucide/svelte/icons/x";
     import {Button} from "$lib/ui/button";
 
     interface BadgeItem {

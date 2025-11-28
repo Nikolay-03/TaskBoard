@@ -3,7 +3,6 @@
     import {TaskBadges, TaskModal} from "$lib/components/tasks";
     import type {HTMLAttributes} from "svelte/elements";
     import {CardContent} from "$lib/ui/card/index.js";
-    import {Badge} from "$lib/ui/badge/index.js";
     import type {ITask} from "$api/task";
 
     const {title, description, labels, id, assignees}: ITask = $props();
