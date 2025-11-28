@@ -1,16 +1,22 @@
-import tailwindcss from "@tailwindcss/vite";
-import {defineConfig} from 'vite';
-import {router} from 'sv-router/vite-plugin';
-import {svelte} from '@sveltejs/vite-plugin-svelte';
-import path from "path";
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'vite';
+import { router } from 'sv-router/vite-plugin';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [tailwindcss(), svelte(), router({
-        path: 'src/routes',
-    }),],
-    resolve: {alias: {
-        $lib: path.resolve("./src/lib"),
-        $api: path.resolve("./src/api"),
-    }}
+	plugins: [
+		tailwindcss(),
+		svelte(),
+		router({
+			path: 'src/routes'
+		})
+	],
+	resolve: {
+		alias: {
+			$lib: path.resolve('./src/lib'),
+			$api: path.resolve('./src/api')
+		}
+	}
 });

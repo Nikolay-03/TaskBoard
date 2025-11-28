@@ -2,38 +2,38 @@ import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 import Kanban from '@lucide/svelte/icons/layout-panel-left';
 import Star from '@lucide/svelte/icons/star';
 import Settings from '@lucide/svelte/icons/settings';
-import type {Component} from "svelte";
+import type { Component } from 'svelte';
 
 export interface IMenuItem {
-    id: string;
-    name: string;
-    icon: Component;
-    href: string;
+	id: string;
+	name: string;
+	icon: Component;
+	href: string;
 }
 
 export const menuItems: IMenuItem[] = [
-    {
-        id: '1',
-        name: 'Dashboard',
-        href: '/',
-        icon: LayoutDashboard,
-    },
-    {
-        id: '2',
-        name: 'Boards',
-        href: '/boards',
-        icon: Kanban,
-    },
-    {
-        id: '3',
-        name: 'Favorites',
-        href: '/favorites',
-        icon: Star,
-    },
-    {
-        id: '4',
-        name: 'Settings',
-        href: '/settings',
-        icon: Settings,
-    }
+	{
+		id: '1',
+		name: 'Dashboard',
+		href: '/',
+		icon: LayoutDashboard
+	},
+	{
+		id: '2',
+		name: 'Boards',
+		href: '/boards',
+		icon: Kanban
+	},
+	{
+		id: '3',
+		name: 'Favorites',
+		href: '/favorites',
+		icon: Star
+	},
+	{
+		id: '4',
+		name: 'Settings',
+		href: '/settings',
+		icon: Settings
+	}
 ];

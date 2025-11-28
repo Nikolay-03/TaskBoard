@@ -1,3 +1,3 @@
-import MainWrapper from "./MainWrapper.svelte";
+import MainWrapper from './MainWrapper.svelte';
 
-export {MainWrapper};
+export { MainWrapper };

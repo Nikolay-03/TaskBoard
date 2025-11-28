@@ -1,6 +1,5 @@
 <script>
-    import {LoginForm} from "$lib/components/auth/index.js";
+	import { LoginForm } from '$lib/components/auth/index.js';
 </script>
 
-
-<LoginForm/>
+<LoginForm />

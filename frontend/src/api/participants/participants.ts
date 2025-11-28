@@ -1,5 +1,5 @@
-export interface IParticipant  {
-    id: number
-    email: string
-    name: string
+export interface IParticipant {
+	id: number;
+	email: string;
+	name: string;
 }

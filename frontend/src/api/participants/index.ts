@@ -1,1 +1,1 @@
-export * from './participants'
+export * from './participants';
