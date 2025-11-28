@@ -13,9 +13,7 @@ public class JsonUtils {
 
     static {
         MAPPER = new ObjectMapper();
-        // Поддержка java.time.* (Instant, LocalDate и т.д.)
         MAPPER.registerModule(new JavaTimeModule());
-        // Чтобы даты не были числами (timestamp), а были строками ISO-8601
         MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 

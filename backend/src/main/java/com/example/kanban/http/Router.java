@@ -21,6 +21,5 @@ public class Router {
     public void registerRoutes() {
         server.createContext("/api/auth", new AuthHandler(authService));
         server.createContext("/api/boards", new BoardHandler(authService, boardService));
-        // сюда потом добавишь /api/tasks, /api/columns и т.д.
     }
 }

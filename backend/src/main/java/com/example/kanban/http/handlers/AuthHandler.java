@@ -20,7 +20,7 @@ public class AuthHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String path = exchange.getRequestURI().getPath(); // /api/auth/...
+        String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
 
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
@@ -60,11 +60,7 @@ public class AuthHandler implements HttpHandler {
         );
         ex.sendResponseHeaders(201, 0);
         try (OutputStream os = ex.getResponseBody()) {
-            JsonUtils.writeJson(os, Map.of(
-                    "id", u.getId(),
-                    "email", u.getEmail(),
-                    "name", u.getName()
-            ));
+            JsonUtils.writeJson(os, u);
         }
     }
 
@@ -91,11 +87,7 @@ public class AuthHandler implements HttpHandler {
         ex.sendResponseHeaders(200, 0);
         try (OutputStream os = ex.getResponseBody()) {
             JsonUtils.writeJson(os, Map.of(
-                    "user", Map.of(
-                            "id", u.getId(),
-                            "email", u.getEmail(),
-                            "name", u.getName()
-                    ),
+                    "user", u,
                     "sessionId", sessionId
             ));
         }
@@ -116,11 +108,7 @@ public class AuthHandler implements HttpHandler {
 
         ex.sendResponseHeaders(200, 0);
         try (OutputStream os = ex.getResponseBody()) {
-            JsonUtils.writeJson(os, Map.of(
-                    "id", u.getId(),
-                    "email", u.getEmail(),
-                    "name", u.getName()
-            ));
+            JsonUtils.writeJson(os, u);
         }
     }
 
@@ -132,14 +120,8 @@ public class AuthHandler implements HttpHandler {
         ex.sendResponseHeaders(204, -1);
     }
 
-    // --- helpers ---
 
     private String extractSessionId(HttpExchange ex) {
-        // 1. Header X-Session-Id
-        String sessionId = ex.getRequestHeaders().getFirst("X-Session-Id");
-        if (sessionId != null && !sessionId.isBlank()) return sessionId;
-
-        // 2. Cookie SESSION_ID
         String cookie = ex.getRequestHeaders().getFirst("Cookie");
         if (cookie != null) {
             for (String part : cookie.split(";")) {
@@ -163,7 +145,6 @@ public class AuthHandler implements HttpHandler {
         sendError(ex, 404, "Not found");
     }
 
-    // --- DTO ---
 
     public static class RegisterRequest {
         public String email;
