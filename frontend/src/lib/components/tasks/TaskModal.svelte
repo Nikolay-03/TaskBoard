@@ -1,65 +1,69 @@
 <script lang="ts">
-	import {
-		Dialog,
-		DialogHeader,
-		DialogTitle,
-		DialogTrigger,
-		DialogContent,
-		DialogDescription
-	} from '$lib/ui/dialog';
-	import { type Snippet } from 'svelte';
-	import type { HTMLAttributes } from 'svelte/elements';
-	import { Spinner } from '$lib/ui/spinner';
-	import { api } from '$api';
-	import { useGetTask } from '$api/task';
-	interface Props {
-		card: Snippet<[HTMLAttributes<HTMLDivElement>]>;
-		id: number;
-	}
-	let { card, id }: Props = $props();
-	const taskQuery = useGetTask(id);
-	let open = $state(false);
-	let loading = $state(false);
-	let data = $state();
-	let error = $state();
-	$effect(() => {
-		if (!open) return;
+	import {fade} from 'svelte/transition'
+    import {
+        Dialog,
+        DialogHeader,
+        DialogTitle,
+        DialogTrigger,
+        DialogContent,
+    } from '$lib/ui/dialog';
+    import {type Snippet} from 'svelte';
+    import type {HTMLAttributes} from 'svelte/elements';
+    import {Spinner} from '$lib/ui/spinner';
+    import {useGetTask} from '$api/task';
+	import TaskBadges from "./shared/TaskBadges.svelte";
+	import {Label} from "$lib/ui/label";
 
-		loading = true;
-		data = null;
-		error = null;
-		(async () => {
-			const res = await api.get('/boards/1');
-			loading = false;
-			data = res.data;
-			error = res.error;
-		})();
-	});
-	$effect(() => {
-		if (!open) return;
+    interface Props {
+        card: Snippet<[HTMLAttributes<HTMLDivElement>]>;
+        id: number;
+    }
+
+    let {card, id}: Props = $props();
+
+    let taskQuery = useGetTask(id);
+	let data = $derived(taskQuery.data)
+    let open = $state(false);
+
+    $effect(() => {
+        if (!open) return;
 		taskQuery.refetch();
-	});
+    });
 </script>
 
 <Dialog bind:open>
-	<DialogTrigger>
-		{#snippet child({ props })}
-			{@render card(props)}
-		{/snippet}
-	</DialogTrigger>
-	<DialogContent class="min-h-[400px]">
-		{#if loading}
-			<div class="flex h-full w-full items-center justify-center">
-				<Spinner class="size-10" />
+    <DialogTrigger>
+        {#snippet child({props})}
+            {@render card(props)}
+        {/snippet}
+    </DialogTrigger>
+    <DialogContent>
+        {#if taskQuery.isLoading}
+            <div class="flex w-full items-center justify-center h-[400px]">
+                <Spinner class="size-10"/>
+            </div>
+        {:else if taskQuery.error}
+            <p class="text-red-500" transition:fade>Ошибка: {taskQuery.error}</p>
+        {:else if data}
+            <DialogHeader>
+                <DialogTitle>{data.title}</DialogTitle>
+            </DialogHeader>
+			<div class="flex flex-col gap-1">
+				<Label class="text-base">Description</Label>
+				<p class="text-sm text-muted-foreground">{data.description}</p>
 			</div>
-		{:else if error}
-			<p class="text-red-500">Ошибка: {String(error)}</p>
-		{:else if data}
-			<DialogHeader>
-				<DialogTitle></DialogTitle>
-			</DialogHeader>
-			this is task
-			<DialogDescription></DialogDescription>
-		{/if}
-	</DialogContent>
+			<div class="flex flex-col gap-1">
+				<Label class="text-base">Labels</Label>
+				<TaskBadges items={data.labels}/>
+			</div>
+			<div class="flex flex-col gap-1">
+				<Label class="text-base">Assignees</Label>
+				<TaskBadges items={data.assignees}/>
+			</div>
+			<div class="flex flex-col gap-1">
+				<Label class="text-base">Participants</Label>
+				<TaskBadges items={data.participants}/>
+			</div>
+        {/if}
+    </DialogContent>
 </Dialog>

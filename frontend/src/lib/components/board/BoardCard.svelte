@@ -15,7 +15,7 @@
 				<CardTitle>{title}</CardTitle>
 				<CardDescription>{description}</CardDescription>
 			</CardHeader>
-			<CardContent class="flex flex-col gap-2">
+			<CardContent class="flex flex-col gap-4">
 				<TaskBadges items={labels} />
 				<TaskBadges items={assignees} />
 			</CardContent>

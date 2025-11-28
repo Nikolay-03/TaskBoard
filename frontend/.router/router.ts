@@ -7,14 +7,14 @@ import Index from '../src/routes/index.svelte';
 import Layout from '../src/routes/layout.svelte';
 
 export const routes = {
-	'/(auth)': {
-		layout: AuthLayout,
-		'/login': AuthLogin,
-		'/registration': AuthRegistration
-	},
-	'*notfound': Notfound,
-	'/': Index,
-	layout: Layout
+  '/(auth)': {
+    'layout': AuthLayout,
+    '/login': AuthLogin,
+    '/registration': AuthRegistration
+  },
+  '*notfound': Notfound,
+  '/': Index,
+  'layout': Layout
 };
 export type Routes = typeof routes;
 export const { p, navigate, isActive, preload, route } = createRouter(routes);

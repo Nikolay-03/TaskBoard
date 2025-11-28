@@ -92,8 +92,8 @@
 			<DialogTitle>Create task</DialogTitle>
 		</DialogHeader>
 		<form onsubmit={handleSubmit} class="flex flex-col gap-3">
-			<InputField title="Title" bind:value={title} placeholder="Task Title" />
-			<TextAreaField title="Description" bind:value={description} placeholder="TaskDescription" />
+			<InputField title="Title" bind:value={title} placeholder="Task title" />
+			<TextAreaField title="Description" bind:value={description} placeholder="Task description" />
 			<DateField title="Deadline date" bind:value={dueDate} />
 			<Button onclick={() => (labelsModalOpen = true)} variant="outline">Select labels</Button>
 			<LabelsField
