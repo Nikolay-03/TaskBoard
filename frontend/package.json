@@ -38,6 +38,7 @@
   "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd",
   "dependencies": {
     "@tanstack/svelte-query": "^6.0.9",
+    "@tanstack/svelte-query-devtools": "^6.0.2",
     "mode-watcher": "^1.1.0",
     "sv-router": "^0.11.0",
     "zod": "^4.1.13"

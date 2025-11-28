@@ -42,13 +42,7 @@ public class BoardService {
         if (board.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
 
         List<Column> columns = columnRepository.findByBoardId(boardId);
-        // все задачи этого борда
-        List<Task> tasks = taskRepository.findByBoardId(boardId); // нужно добавить метод в TaskRepository
-
-        List<Long> taskIds = tasks.stream().map(Task::getId).collect(Collectors.toList());
-        Map<Long, List<User>> assigneesByTask = taskAssigneeRepository.findUsersByTaskIds(taskIds);
-        Map<Long, List<User>> participantsByTask = taskParticipantRepository.findUsersByTaskIds(taskIds);
-        Map<Long, List<Label>> labelsByTask = taskLabelRepository.findLabelsByTaskIds(taskIds);
+        List<Task> tasks = taskRepository.findByBoardId(boardId);
 
         Map<Long, List<Task>> tasksByColumn = tasks.stream()
                 .collect(Collectors.groupingBy(Task::getColumnId));
@@ -59,6 +53,10 @@ public class BoardService {
             List<TaskView> tvList = new ArrayList<>();
             for (Task t : colTasks) {
                 TaskView tv = new TaskView();
+                long tId = t.getId();
+                List<User> assigneesByTask = taskAssigneeRepository.getAssigneesByTaskId(tId);
+                List<User> participantsByTask = taskParticipantRepository.getParticipantsByTaskId(tId);
+                List<Label> labelsByTask = taskLabelRepository.getLabelsByTaskId(tId);
                 tv.setId(t.getId());
                 tv.setBoardId(t.getBoardId());
                 tv.setColumnId(t.getColumnId());
@@ -68,9 +66,10 @@ public class BoardService {
                 tv.setDueDate(t.getDueDate());
                 tv.setCreatedAt(t.getCreatedAt());
                 tv.setUpdatedAt(t.getUpdatedAt());
-                tv.setAssignees(assigneesByTask.getOrDefault(t.getId(), List.of()));
-                tv.setParticipants(participantsByTask.getOrDefault(t.getId(), List.of()));
-                tv.setLabels(labelsByTask.getOrDefault(t.getId(), List.of()));
+
+                tv.setAssignees(assigneesByTask);
+                tv.setParticipants(participantsByTask);
+                tv.setLabels(labelsByTask);
                 tvList.add(tv);
             }
             BoardColumnView cv = new BoardColumnView();
@@ -139,7 +138,7 @@ public class BoardService {
         columnRepository.deleteColumn(columnId);
     }
 
-    public List<BoardMember> getMembers(long boardId) throws SQLException {
+    public List<User> getMembers(long boardId) throws SQLException {
         return boardMemberRepository.getMembersByBoardId(boardId);
     }
 }

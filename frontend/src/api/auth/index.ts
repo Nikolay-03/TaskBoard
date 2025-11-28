@@ -1,6 +1,7 @@
 import {createMutation, createQuery} from "@tanstack/svelte-query";
 import {api} from "$api";
-import type {ILoginBody, IRegisterBody, IUser, ILoginResult} from "./auth";
+import type {ILoginBody, IRegisterBody, ILoginResult} from "./auth";
+import type {IUser} from "$api/user";
 
 export * from "./auth";
 

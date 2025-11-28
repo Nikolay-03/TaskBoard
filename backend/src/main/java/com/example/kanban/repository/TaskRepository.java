@@ -18,8 +18,7 @@ public class TaskRepository {
 
     public Task findById(long taskId) throws SQLException {
         String sql = """
-                SELECT id, board_id, column_id, title, description, position,
-                       due_date, created_at, updated_at
+                SELECT *
                 FROM tasks
                 WHERE id = ?
                 """;

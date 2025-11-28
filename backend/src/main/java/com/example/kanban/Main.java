@@ -3,23 +3,19 @@ package com.example.kanban;
 import com.example.kanban.config.AppConfig;
 import com.example.kanban.db.ConnectionManager;
 import com.example.kanban.http.CorsFilter;
-import com.example.kanban.http.Router;
 import com.example.kanban.http.handlers.*;
 import com.example.kanban.repository.*;
 import com.example.kanban.service.AuthService;
 import com.example.kanban.service.BoardService;
 import com.sun.net.httpserver.HttpServer;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.logging.Logger;
 
 public class Main {
     public static void main(String[] args) throws Exception {
         AppConfig config = new AppConfig();
         ConnectionManager cm = new ConnectionManager(config);
 
-        // Репозитории
         UserRepository userRepo = new UserRepository(cm);
         SessionRepository sessionRepo = new SessionRepository(cm);
         BoardRepository boardRepo = new BoardRepository(cm);
@@ -30,7 +26,6 @@ public class Main {
         TaskRepository taskRepo = new TaskRepository(cm);
         BoardMemberRepository boardMemberRepo = new BoardMemberRepository(cm);
 
-        // Сервисы
         AuthService authService = new AuthService(userRepo, sessionRepo);
         BoardService boardService = new BoardService(
                 boardRepo, columnRepo, taskRepo, assigneeRepo, participantRepo, labelRepo, boardMemberRepo
@@ -44,7 +39,6 @@ public class Main {
                 labelRepo
         );
 
-        // HTTP-сервер
         HttpServer server = HttpServer.create(new InetSocketAddress(config.getServerPort()), 0);
         server.createContext("/openapi.yaml", new OpenApiHandler());
         server.createContext("/swagger", new SwaggerUiHandler());

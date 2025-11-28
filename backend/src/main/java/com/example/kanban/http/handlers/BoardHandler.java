@@ -1,10 +1,8 @@
 package com.example.kanban.http.handlers;
 
 import com.example.kanban.http.JsonUtils;
-import com.example.kanban.model.BoardMember;
 import com.example.kanban.model.BoardView;
 import com.example.kanban.model.User;
-import com.example.kanban.repository.BoardMemberRepository;
 import com.example.kanban.service.AuthService;
 import com.example.kanban.service.BoardService;
 import com.sun.net.httpserver.HttpExchange;
@@ -62,7 +60,7 @@ public class BoardHandler implements HttpHandler {
 
     private void handleGetBoard(HttpExchange ex, long boardId) throws Exception {
         User user = requireAuth(ex);
-        if (user == null) return; // ответ уже отправлен
+        if (user == null) return;
 
         try {
             BoardView view = boardService.getBoardView(boardId, user.getId());
@@ -82,7 +80,7 @@ public class BoardHandler implements HttpHandler {
         User user = requireAuth(ex);
         if (user == null) return;
         try {
-            List<BoardMember> members = boardService.getMembers(boardId);
+            List<User> members = boardService.getMembers(boardId);
 
             ex.sendResponseHeaders(200, 0);
             try (OutputStream os = ex.getResponseBody()) {

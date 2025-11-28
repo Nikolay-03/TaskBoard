@@ -1,8 +1,5 @@
-export interface IUser {
-    id: number
-    email: string
-    name: string
-}
+import type {IUser} from "$api/user";
+
 export interface IRegisterBody {
     email: string
     password: string

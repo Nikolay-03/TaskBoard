@@ -15,8 +15,8 @@ public class Task {
     private Instant createdAt;
     private Instant updatedAt;
     private List<Label> labels;
-    private List<TaskParticipant> participants;
-    private List<TaskAssignee> assignees;
+    private List<User> participants;
+    private List<User> assignees;
 
     public long getId() {
         return id;
@@ -98,19 +98,19 @@ public class Task {
         this.labels = labels;
     }
 
-    public List<TaskParticipant> getParticipants() {
+    public List<User> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<TaskParticipant> participants) {
+    public void setParticipants(List<User> participants) {
         this.participants = participants;
     }
 
-    public List<TaskAssignee> getAssignees() {
+    public List<User> getAssignees() {
         return assignees;
     }
 
-    public void setAssignees(List<TaskAssignee> assignees) {
+    public void setAssignees(List<User> assignees) {
         this.assignees = assignees;
     }
 }

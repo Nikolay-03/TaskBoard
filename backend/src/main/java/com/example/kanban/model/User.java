@@ -1,10 +1,13 @@
 package com.example.kanban.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.Instant;
 
 public class User {
     private long id;
     private String email;
+    @JsonIgnore
     private String passwordHash;
     private String name;
     private Instant createdAt;

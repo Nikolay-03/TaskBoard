@@ -9,10 +9,3 @@ export interface IBoard {
     updatedAt: string,
     columns: IColumn[],
 }
-
-export interface IBoardMember {
-    boardId: number,
-    userId: number,
-    userName: string,
-    userEmail: string,
-}

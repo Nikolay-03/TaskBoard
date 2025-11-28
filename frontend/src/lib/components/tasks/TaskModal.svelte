@@ -4,8 +4,14 @@
     import type {HTMLAttributes} from "svelte/elements";
     import {Spinner} from "$lib/ui/spinner";
     import {api} from "$api";
-    let {card}: { card: Snippet<[HTMLAttributes<HTMLDivElement>]> } = $props();
-    let open = $state(false)
+    import {useGetTask} from "$api/task";
+    interface Props {
+        card: Snippet<[HTMLAttributes<HTMLDivElement>]>
+        id: number
+    }
+    let {card, id}: Props = $props();
+    const taskQuery = useGetTask(id)
+    let open = $state(false);
     let loading = $state(false);
     let data = $state();
     let error = $state();
@@ -22,9 +28,13 @@
             error = res.error;
         })();
     })
+    $effect(() => {
+        if (!open) return;
+        taskQuery.refetch();
+    });
 </script>
 
-<Dialog {open} onOpenChange={() => open = !open}>
+<Dialog bind:open>
     <DialogTrigger>
         {#snippet child({props})}
             {@render card(props)}

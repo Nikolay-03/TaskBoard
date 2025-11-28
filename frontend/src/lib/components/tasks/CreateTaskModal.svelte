@@ -5,13 +5,13 @@
     import {Button, type ButtonProps} from "$lib/ui/button";
     import {useLabels} from "$api/label";
     import {useMembers} from "$api/board";
-    import AssigneesField from "./AssigneesField.svelte";
-    import ParticipantsField from "./ParticipantsField.svelte";
-    import LabelsField from "./LabelsField.svelte";
+    import AssigneesField from "$lib/components/tasks/shared/AssigneesField.svelte";
+    import ParticipantsField from "$lib/components/tasks/shared/ParticipantsField.svelte";
+    import LabelsField from "$lib/components/tasks/shared/LabelsField.svelte";
     import {DateField, InputField, TextAreaField} from "$lib/components/form";
     import {type CalendarDate, getLocalTimeZone, today} from "@internationalized/date";
     import {toast} from "svelte-sonner";
-    import {createTaskSchema, type CreateTaskSchema} from "$lib/components/tasks/CreateTaskModal/schema";
+    import {createTaskSchema, type CreateTaskSchema} from "$lib/components/tasks/shared/schema";
     import {useCreateTask} from "$api/task";
     import {queryClient} from "$api";
 

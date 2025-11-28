@@ -1,7 +1,6 @@
 package com.example.kanban.repository;
 
 import com.example.kanban.db.ConnectionManager;
-import com.example.kanban.model.BoardMember;
 import com.example.kanban.model.User;
 
 import java.sql.Connection;
@@ -17,18 +16,18 @@ public class BoardMemberRepository {
     public BoardMemberRepository(ConnectionManager cm) {
         this.cm = cm;
     }
-    public List<BoardMember> getMembersByBoardId(long boardId) throws SQLException {
-        List<BoardMember> members = new ArrayList<>();
+    public List<User> getMembersByBoardId(long boardId) throws SQLException {
+        List<User> members = new ArrayList<>();
         String sql = "SELECT * FROM board_members INNER JOIN users ON board_members.user_id=users.id WHERE board_id=?";
         try(Connection con = cm.getConnection(); PreparedStatement ps = con.prepareStatement(sql)){
             ps.setLong(1,boardId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
-                BoardMember member = new BoardMember();
-                member.setBoardId(rs.getLong("board_id"));
-                member.setUserId(rs.getLong("user_id"));
-                member.setUserName(rs.getString("name"));
-                member.setUserEmail(rs.getString("email"));
+                User member = new User();
+                member.setId(rs.getLong("id"));
+                member.setEmail(rs.getString("email"));
+                member.setName(rs.getString("name"));
+                member.setCreatedAt(rs.getTimestamp("created_at").toInstant());
                 members.add(member);
             }
         }

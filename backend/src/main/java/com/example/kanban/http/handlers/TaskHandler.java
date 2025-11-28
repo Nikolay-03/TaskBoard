@@ -48,13 +48,6 @@ public class TaskHandler implements HttpHandler {
 
         try {
             String[] parts = path.split("/");
-            // варианты:
-            // /api/columns/{columnId}/tasks
-            // /api/tasks/{taskId}
-            // /api/tasks/{taskId}/assignees
-            // /api/tasks/{taskId}/assignees/{userId}
-            // /api/tasks/{taskId}/participants[/{userId}]
-            // /api/tasks/{taskId}/labels[/{labelId}]
 
             if ("POST".equalsIgnoreCase(method)
                     && parts.length == 4
@@ -63,6 +56,13 @@ public class TaskHandler implements HttpHandler {
             ) {
                 long columnId = Long.parseLong(parts[3]);
                 handleCreateTaskInColumn(exchange, columnId);
+
+            } else if ("GET".equalsIgnoreCase(method)
+                    && parts.length == 4
+                    && "api".equals(parts[1])
+                    && "tasks".equals(parts[2])) {
+                long taskId = Long.parseLong(parts[3]);
+                handleGetTaskById(exchange, taskId);
 
             } else if ("PATCH".equalsIgnoreCase(method)
                     && parts.length == 4
@@ -78,8 +78,7 @@ public class TaskHandler implements HttpHandler {
                 long taskId = Long.parseLong(parts[3]);
                 handleDeleteTask(exchange, taskId);
 
-            }
-            else {
+            } else {
                 sendError(exchange, 404, "Not found");
             }
 
@@ -89,7 +88,23 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
-    // ---------- создание задачи в столбце ----------
+    private void handleGetTaskById(HttpExchange ex, long taskId) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+
+        Task t = taskRepository.findById(taskId);
+        if (t == null) return;
+        List<User> assignees = assigneeRepository.getAssigneesByTaskId(taskId);
+        List<User> participants = participantRepository.getParticipantsByTaskId(taskId);
+        List<Label> labels = taskLabelRepository.getLabelsByTaskId(taskId);
+        t.setAssignees(assignees);
+        t.setParticipants(participants);
+        t.setLabels(labels);
+        ex.sendResponseHeaders(201, 0);
+        try (OutputStream os = ex.getResponseBody()) {
+            JsonUtils.writeJson(os, t);
+        }
+    }
 
     private void handleCreateTaskInColumn(HttpExchange ex, long columnId) throws Exception {
         User user = requireAuth(ex);
@@ -144,8 +159,6 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
-    // ---------- обновление задачи ----------
-
     private void handleUpdateTask(HttpExchange ex, long taskId) throws Exception {
         User user = requireAuth(ex);
         if (user == null) return;
@@ -197,7 +210,6 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
-    // ---------- удаление задачи ----------
 
     private void handleDeleteTask(HttpExchange ex, long taskId) throws Exception {
         User user = requireAuth(ex);
@@ -247,13 +259,12 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
-    // ---------- DTO ----------
 
     public static class CreateTaskRequest {
         public String title;
         public String description;
         public Integer position;
-        public String dueDate; // yyyy-MM-dd
+        public String dueDate;
         public List<Long> labels;
         public List<Long> participants;
         public List<Long> assignees;

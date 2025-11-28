@@ -4,7 +4,6 @@
     import {Spinner} from "$lib/ui/spinner";
 
     const board = useBoard(1);
-    $inspect(board.isLoading)
 </script>
 
 <div class="flex flex-col gap-5 flex-1">
