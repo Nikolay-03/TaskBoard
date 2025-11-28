@@ -5,6 +5,7 @@
     import {MultiSelect} from "$lib/components";
     import {Button} from "$lib/ui/button";
     import {CommandItem} from "$lib/ui/command";
+    import {TaskBadges} from "$lib/components/tasks";
 
     interface Props {
         labels: number[]
@@ -13,7 +14,7 @@
         handleOpenChange: (open: boolean) => void
     }
 
-    let {labels, labelsOpts, open, handleOpenChange}: Props = $props()
+    let {labels = $bindable(), labelsOpts, open, handleOpenChange}: Props = $props()
     const selectedLabels = $derived.by(() => {
             return labels.map(lId => labelsOpts?.find(l => l.id === lId)) as ILabel[]
         }
@@ -24,28 +25,10 @@
     const handleAddLabel = (id: number) => labels.push(id)
 
 </script>
-<div class="flex gap-1 overflow-x-scroll no-scrollbar max-w-[462px] min-h-fit">
-    {#each selectedLabels as label (label.id)}
-        <Badge variant={label.color}>
-            {label.name}
-            <Button onclick={() => handleDeleteLabel(label.id)} variant="clean" size="fit">
-                <XIcon/>
-            </Button>
-        </Badge>
-    {/each}
-</div>
+<TaskBadges items={selectedLabels} onDelete={handleDeleteLabel}/>
 <MultiSelect {open} {handleOpenChange} heading="Labels">
     {#snippet renderSelected()}
-        <div class="p-2 flex flex-wrap gap-1">
-            {#each selectedLabels as label (label.id)}
-                <Badge variant={label.color}>
-                    {label.name}
-                    <Button onclick={() => handleDeleteLabel(label.id)} variant="clean" size="fit">
-                        <XIcon/>
-                    </Button>
-                </Badge>
-            {/each}
-        </div>
+        <TaskBadges items={selectedLabels} onDelete={handleDeleteLabel} className="p-2"/>
     {/snippet}
     {#snippet renderOptions()}
         {#if labelsOpts}

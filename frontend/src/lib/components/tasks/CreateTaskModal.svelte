@@ -95,7 +95,7 @@
                    open={labelsModalOpen}
                    handleOpenChange={handleLabelModalOpenChange}
                    labelsOpts={labelsQuery.data}
-                   {labels}
+                   bind:labels
            />
             <Button onclick={() => assigneesModalOpen = true} variant="outline">
                 Select assignees
@@ -104,7 +104,7 @@
                     open={assigneesModalOpen}
                     handleOpenChange={handleAssigneesModalOpenChange}
                     members={membersQuery.data}
-                    {assignees}
+                    bind:assignees
             />
             <Button onclick={() => participantsModalOpen = true} variant="outline">
                 Select participants
@@ -113,13 +113,13 @@
                     open={participantsModalOpen}
                     handleOpenChange={handleParticipantsModalOpenChange}
                     members={membersQuery.data}
-                    {participants}
+                    bind:participants
             />
             <div class="flex justify-between">
                 {#if error}
                     <div class="text-sm text-destructive" transition:fade>{error}</div>
                 {/if}
-                <Button type="submit" class="ml-auto" disabled={createTaskMutation.isLoading}>
+                <Button type="submit" class="ml-auto" disabled={createTaskMutation.isPending}>
                     Create
                 </Button>
             </div>
