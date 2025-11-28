@@ -17,7 +17,7 @@ export interface ITask {
 	labels: ILabel[];
 }
 
-export interface ICreateTaskBody {
+interface ITaskActionBody {
 	title: string;
 	description: string;
 	dueDate: string;
@@ -27,5 +27,9 @@ export interface ICreateTaskBody {
 }
 export interface ICreateTaskVariables {
 	columnId: number;
-	body: ICreateTaskBody;
+	body: ITaskActionBody;
+}
+export interface IUpdateTaskVariables {
+	id: number;
+	body: Partial<ITaskActionBody>;
 }

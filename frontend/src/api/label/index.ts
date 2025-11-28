@@ -4,7 +4,7 @@ import type { ILabel } from '$api/labels';
 
 export * from './label';
 export const useLabels = () =>
-	createQuery(() => ({
+	createQuery<ILabel[]>(() => ({
 		queryKey: ['labels'],
-		queryFn: () => api.get<ILabel[]>('/labels')
+		queryFn: () => api.get('/labels')
 	}));

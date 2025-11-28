@@ -163,46 +163,48 @@ public class TaskHandler implements HttpHandler {
         User user = requireAuth(ex);
         if (user == null) return;
 
+        Task exTask = taskRepository.findById(taskId);
         UpdateTaskRequest req = JsonUtils.readJson(ex.getRequestBody(), UpdateTaskRequest.class);
-        if (req == null || req.columnId == null || req.title == null || req.title.isBlank() || req.position == null) {
+        if (req == null || exTask == null) {
             sendError(ex, 400, "Invalid request");
             return;
         }
 
-        LocalDate dueDate = (req.dueDate != null && !req.dueDate.isBlank())
-                ? LocalDate.parse(req.dueDate)
-                : null;
-
+        long columnId = req.columnId != null ? req.columnId : exTask.getColumnId();
+        String title = req.title != null ? req.title : exTask.getTitle();
+        String description = req.description != null ? req.description : exTask.getDescription();
+        int position = req.position != null ? req.position : exTask.getPosition();
+        LocalDate dueDate = req.dueDate != null && !req.dueDate.isBlank()? LocalDate.parse(req.dueDate) : exTask.getDueDate();
         Task t = taskRepository.updateTask(
                 taskId,
-                req.columnId,
-                req.title,
-                req.description,
-                req.position,
+                columnId,
+                title,
+                description,
+                position,
                 dueDate
         );
         if (req.assignees != null) {
             for (long assigneeId : req.assignees) {
                 assigneeRepository.addAssignee(taskId, assigneeId);
             }
-            t.setAssignees(assigneeRepository.getAssigneesByTaskId(taskId));
         }
         if (req.labels != null) {
             for (long labelId : req.labels) {
                 taskLabelRepository.addLabelToTask(taskId, labelId);
             }
-            t.setLabels(taskLabelRepository.getLabelsByTaskId(taskId));
         }
         if (req.participants != null) {
             for (long participantId : req.participants) {
                 participantRepository.addParticipant(taskId, participantId);
             }
-            t.setParticipants(participantRepository.getParticipantsByTaskId(taskId));
         }
         if (t == null) {
             sendError(ex, 404, "Task not found");
             return;
         }
+        t.setAssignees(assigneeRepository.getAssigneesByTaskId(taskId));
+        t.setLabels(taskLabelRepository.getLabelsByTaskId(taskId));
+        t.setParticipants(participantRepository.getParticipantsByTaskId(taskId));
 
         ex.sendResponseHeaders(200, 0);
         try (OutputStream os = ex.getResponseBody()) {

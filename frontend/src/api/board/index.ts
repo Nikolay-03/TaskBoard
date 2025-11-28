@@ -5,14 +5,14 @@ import type { IUser } from '$api/user';
 
 export * from './board';
 export const useBoard = (id: number) =>
-	createQuery(() => ({
+	createQuery<IBoard>(() => ({
 		queryKey: ['board', id],
-		queryFn: () => api.get<IBoard>(`/boards/${id}`),
+		queryFn: () => api.get(`/boards/${id}`),
 		refetchOnMount: false
 	}));
 
 export const useMembers = (id: number) =>
-	createQuery(() => ({
+	createQuery<IUser[]>(() => ({
 		queryKey: ['members', id],
-		queryFn: () => api.get<IUser[]>(`/boards/${id}/members`)
+		queryFn: () => api.get(`/boards/${id}/members`)
 	}));
