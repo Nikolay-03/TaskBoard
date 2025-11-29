@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PencilIcon } from '@lucide/svelte';
-	import { Card, CardHeader, CardTitle, CardDescription } from '$lib/ui/card';
+	import { Card, CardHeader, CardTitle } from '$lib/ui/card';
 	import { TaskActionModal, TaskBadges, TaskModal } from '$lib/components/tasks';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { CardContent } from '$lib/ui/card/index.js';
@@ -58,7 +58,6 @@
 						</TaskActionModal>
 					</div>
 				</div>
-				<CardDescription>{description}</CardDescription>
 			</CardHeader>
 			<CardContent class="flex flex-col gap-4">
 				<TaskBadges items={labels} />

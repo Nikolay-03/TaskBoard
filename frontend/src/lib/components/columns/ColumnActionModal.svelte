@@ -71,9 +71,7 @@
 		open = openVal;
 	};
 	$effect(() => {
-		if (!open) {
-			title = '';
-		} else {
+		if (open) {
 			title = defaultValues?.title ?? '';
 		}
 	});
