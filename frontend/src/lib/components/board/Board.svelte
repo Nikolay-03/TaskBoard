@@ -69,7 +69,8 @@
 	use:dndzone={{
 		items: columnItems,
 		flipDurationMs,
-		type: 'columns'
+		type: 'columns',
+		dropTargetClasses: ['!outline-none']
 	}}
 	on:consider={handleDndConsiderColumns}
 	on:finalize={handleDndFinalizeColumns}
