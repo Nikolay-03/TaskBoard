@@ -42,7 +42,39 @@ public class TaskParticipantRepository {
             ps.executeUpdate();
         }
     }
+    public void setParticipantsForTask(long taskId, List<Long> participantsIds) throws SQLException {
+        try (Connection con = cm.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                try (PreparedStatement deletePs = con.prepareStatement(
+                        "DELETE FROM task_participants WHERE task_id = ?"
+                )) {
+                    deletePs.setLong(1, taskId);
+                    deletePs.executeUpdate();
+                }
 
+                if (participantsIds != null) {
+                    try (PreparedStatement insertPs = con.prepareStatement(
+                            "INSERT INTO task_participants (task_id, user_id) VALUES (?, ?)"
+                    )) {
+                        for (Long aId : participantsIds) {
+                            insertPs.setLong(1, taskId);
+                            insertPs.setLong(2, aId);
+                            insertPs.addBatch();
+                        }
+                        insertPs.executeBatch();
+                    }
+                }
+
+                con.commit();
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
+        }
+    }
     public void removeParticipant(long taskId, long userId) throws SQLException {
         String sql = "DELETE FROM task_participants WHERE task_id = ? AND user_id = ?";
         try (Connection con = cm.getConnection();

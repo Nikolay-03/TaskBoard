@@ -174,7 +174,7 @@ public class TaskHandler implements HttpHandler {
         String title = req.title != null ? req.title : exTask.getTitle();
         String description = req.description != null ? req.description : exTask.getDescription();
         int position = req.position != null ? req.position : exTask.getPosition();
-        LocalDate dueDate = req.dueDate != null && !req.dueDate.isBlank()? LocalDate.parse(req.dueDate) : exTask.getDueDate();
+        LocalDate dueDate = req.dueDate != null && !req.dueDate.isBlank() ? LocalDate.parse(req.dueDate) : exTask.getDueDate();
         Task t = taskRepository.updateTask(
                 taskId,
                 columnId,
@@ -183,24 +183,18 @@ public class TaskHandler implements HttpHandler {
                 position,
                 dueDate
         );
-        if (req.assignees != null) {
-            for (long assigneeId : req.assignees) {
-                assigneeRepository.addAssignee(taskId, assigneeId);
-            }
-        }
-        if (req.labels != null) {
-            for (long labelId : req.labels) {
-                taskLabelRepository.addLabelToTask(taskId, labelId);
-            }
-        }
-        if (req.participants != null) {
-            for (long participantId : req.participants) {
-                participantRepository.addParticipant(taskId, participantId);
-            }
-        }
         if (t == null) {
             sendError(ex, 404, "Task not found");
             return;
+        }
+        if (req.assignees != null) {
+            assigneeRepository.setAssigneesForTask(taskId, req.assignees);
+        }
+        if (req.labels != null) {
+            taskLabelRepository.setLabelsForTask(taskId, req.labels);
+        }
+        if (req.participants != null) {
+            participantRepository.setParticipantsForTask(taskId, req.participants);
         }
         t.setAssignees(assigneeRepository.getAssigneesByTaskId(taskId));
         t.setLabels(taskLabelRepository.getLabelsByTaskId(taskId));

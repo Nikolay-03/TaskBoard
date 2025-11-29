@@ -43,7 +43,39 @@ public class TaskAssigneeRepository {
             ps.executeUpdate();
         }
     }
+    public void setAssigneesForTask(long taskId, List<Long> assigneesIds) throws SQLException {
+        try (Connection con = cm.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                try (PreparedStatement deletePs = con.prepareStatement(
+                        "DELETE FROM task_assignees WHERE task_id = ?"
+                )) {
+                    deletePs.setLong(1, taskId);
+                    deletePs.executeUpdate();
+                }
 
+                if (assigneesIds != null) {
+                    try (PreparedStatement insertPs = con.prepareStatement(
+                            "INSERT INTO task_assignees (task_id, user_id) VALUES (?, ?)"
+                    )) {
+                        for (Long aId : assigneesIds) {
+                            insertPs.setLong(1, taskId);
+                            insertPs.setLong(2, aId);
+                            insertPs.addBatch();
+                        }
+                        insertPs.executeBatch();
+                    }
+                }
+
+                con.commit();
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
+        }
+    }
     public void removeAssignee(long taskId, long userId) throws SQLException {
         String sql = "DELETE FROM task_assignees WHERE task_id = ? AND user_id = ?";
         try (Connection con = cm.getConnection();

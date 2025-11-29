@@ -31,7 +31,39 @@ public class TaskLabelRepository {
         }
         return result;
     }
+    public void setLabelsForTask(long taskId, List<Long> labelIds) throws SQLException {
+        try (Connection con = cm.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                try (PreparedStatement deletePs = con.prepareStatement(
+                        "DELETE FROM task_labels WHERE task_id = ?"
+                )) {
+                    deletePs.setLong(1, taskId);
+                    deletePs.executeUpdate();
+                }
 
+                if (labelIds != null) {
+                    try (PreparedStatement insertPs = con.prepareStatement(
+                            "INSERT INTO task_labels (task_id, label_id) VALUES (?, ?)"
+                    )) {
+                        for (Long labelId : labelIds) {
+                            insertPs.setLong(1, taskId);
+                            insertPs.setLong(2, labelId);
+                            insertPs.addBatch();
+                        }
+                        insertPs.executeBatch();
+                    }
+                }
+
+                con.commit();
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
+        }
+    }
     public void addLabelToTask(long taskId, long labelId) throws SQLException {
         String sql = "INSERT INTO task_labels(task_id, label_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
         try (Connection con = cm.getConnection();
