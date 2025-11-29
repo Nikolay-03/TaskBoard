@@ -246,6 +246,106 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /api/columns/{boardId}:
+    post:
+      summary: Создать колонку
+      tags: [Columns]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateColumnRequest'
+      responses:
+        '201':
+          description: Колонка создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Column'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/columns/{columnId}:
+    patch:
+      summary: Обновить колонку
+      tags: [Columns]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: columnId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateColumnRequest'
+      responses:
+        '200':
+          description: Колонка обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Column'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Колонка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Удалить колонку
+      tags: [Columns]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: columnId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Колонка удалена
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Колонка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 components:
   securitySchemes:
     SessionHeader:
@@ -352,19 +452,21 @@ components:
 
     UpdateTaskRequest:
       type: object
-      required: [columnId, title, position]
       properties:
         columnId:
           type: integer
           format: int64
+          nullable: true
         title:
           type: string
+          nullable: true
         description:
           type: string
           nullable: true
         position:
           type: integer
           format: int32
+          nullable: true
         dueDate:
           type: string
           format: date
@@ -374,16 +476,19 @@ components:
           items:
             type: integer
             format: int64
+          nullable: true
         participants:
           type: array
           items:
             type: integer
             format: int64
+          nullable: true
         assignees:
           type: array
           items:
             type: integer
             format: int64
+          nullable: true
 
     Task:
       type: object
@@ -465,3 +570,42 @@ components:
         Полное представление доски (структура зависит от реализации BoardView на бэкенде).
         Здесь описан как "произвольный объект".
       additionalProperties: true
+
+    Column:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        boardId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        position:
+          type: integer
+          format: int32
+
+    CreateColumnRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        position:
+          type: integer
+          format: int32
+          nullable: true
+          description: Позиция колонки. Если не указана, будет автоматически присвоена следующая позиция.
+
+    UpdateColumnRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          nullable: true
+        position:
+          type: integer
+          format: int32
+          nullable: true
+          description: Новая позиция колонки. При изменении позиции автоматически пересчитываются позиции других колонок.
