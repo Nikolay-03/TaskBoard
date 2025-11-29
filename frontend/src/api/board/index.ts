@@ -8,7 +8,8 @@ export const useBoard = (id: number) =>
 	createQuery<IBoard>(() => ({
 		queryKey: ['board', id],
 		queryFn: () => api.get(`/boards/${id}`),
-		refetchOnMount: false
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
 	}));
 
 export const useMembers = (id: number) =>

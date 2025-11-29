@@ -132,50 +132,161 @@ public class TaskRepository {
 
     public Task updateTask(long taskId, long columnId, String title, String description,
                            int position, LocalDate dueDate) throws SQLException {
-        String sql = """
-                UPDATE tasks
-                SET column_id = ?, title = ?, description = ?, position = ?, due_date = ?, updated_at = now()
-                WHERE id = ?
-                RETURNING id, board_id, column_id, title, description, position,
-                          due_date, created_at, updated_at
-                """;
-        try (Connection con = cm.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, columnId);
-            ps.setString(2, title);
-            ps.setString(3, description);
-            ps.setInt(4, position);
-            if (dueDate != null) {
-                ps.setDate(5, java.sql.Date.valueOf(dueDate));
-            } else {
-                ps.setNull(5, Types.DATE);
-            }
-            ps.setLong(6, taskId);
+        String selectSql = "SELECT column_id, position FROM tasks WHERE id = ?";
+        
+        try (Connection con = cm.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                Long oldColumnId = null;
+                Integer oldPosition = null;
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return null;
-                Task t = new Task();
-                t.setId(rs.getLong("id"));
-                t.setBoardId(rs.getLong("board_id"));
-                t.setColumnId(rs.getLong("column_id"));
-                t.setTitle(rs.getString("title"));
-                t.setDescription(rs.getString("description"));
-                t.setPosition(rs.getInt("position"));
-                java.sql.Date due = rs.getDate("due_date");
-                if (due != null) t.setDueDate(due.toLocalDate());
-                t.setCreatedAt(rs.getTimestamp("created_at").toInstant());
-                t.setUpdatedAt(rs.getTimestamp("updated_at").toInstant());
+                try (PreparedStatement ps = con.prepareStatement(selectSql)) {
+                    ps.setLong(1, taskId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (!rs.next()) {
+                            con.commit();
+                            return null;
+                        }
+                        oldColumnId = rs.getLong("column_id");
+                        oldPosition = rs.getInt("position");
+                    }
+                }
+
+                boolean columnChanged = !oldColumnId.equals(columnId);
+                boolean positionChanged = !oldPosition.equals(position);
+
+                if (columnChanged) {
+                    String shiftOldColumnSql = "UPDATE tasks SET position = position - 1 WHERE column_id = ? AND position > ? AND id != ?";
+                    try (PreparedStatement ps = con.prepareStatement(shiftOldColumnSql)) {
+                        ps.setLong(1, oldColumnId);
+                        ps.setInt(2, oldPosition);
+                        ps.setLong(3, taskId);
+                        ps.executeUpdate();
+                    }
+
+                    String shiftNewColumnSql = "UPDATE tasks SET position = position + 1 WHERE column_id = ? AND position >= ?";
+                    try (PreparedStatement ps = con.prepareStatement(shiftNewColumnSql)) {
+                        ps.setLong(1, columnId);
+                        ps.setInt(2, position);
+                        ps.executeUpdate();
+                    }
+                } else if (positionChanged) {
+                    if (position > oldPosition) {
+                        String shiftSql = "UPDATE tasks SET position = position - 1 WHERE column_id = ? AND position > ? AND position <= ? AND id != ?";
+                        try (PreparedStatement ps = con.prepareStatement(shiftSql)) {
+                            ps.setLong(1, columnId);
+                            ps.setInt(2, oldPosition);
+                            ps.setInt(3, position);
+                            ps.setLong(4, taskId);
+                            ps.executeUpdate();
+                        }
+                    } else {
+                        String shiftSql = "UPDATE tasks SET position = position + 1 WHERE column_id = ? AND position >= ? AND position < ? AND id != ?";
+                        try (PreparedStatement ps = con.prepareStatement(shiftSql)) {
+                            ps.setLong(1, columnId);
+                            ps.setInt(2, position);
+                            ps.setInt(3, oldPosition);
+                            ps.setLong(4, taskId);
+                            ps.executeUpdate();
+                        }
+                    }
+                }
+
+                String updateSql = """
+                        UPDATE tasks
+                        SET column_id = ?, title = ?, description = ?, position = ?, due_date = ?, updated_at = now()
+                        WHERE id = ?
+                        RETURNING id, board_id, column_id, title, description, position,
+                                  due_date, created_at, updated_at
+                        """;
+                Task t;
+                try (PreparedStatement ps = con.prepareStatement(updateSql)) {
+                    ps.setLong(1, columnId);
+                    ps.setString(2, title);
+                    ps.setString(3, description);
+                    ps.setInt(4, position);
+                    if (dueDate != null) {
+                        ps.setDate(5, java.sql.Date.valueOf(dueDate));
+                    } else {
+                        ps.setNull(5, Types.DATE);
+                    }
+                    ps.setLong(6, taskId);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (!rs.next()) {
+                            con.rollback();
+                            return null;
+                        }
+                        t = new Task();
+                        t.setId(rs.getLong("id"));
+                        t.setBoardId(rs.getLong("board_id"));
+                        t.setColumnId(rs.getLong("column_id"));
+                        t.setTitle(rs.getString("title"));
+                        t.setDescription(rs.getString("description"));
+                        t.setPosition(rs.getInt("position"));
+                        java.sql.Date due = rs.getDate("due_date");
+                        if (due != null) t.setDueDate(due.toLocalDate());
+                        t.setCreatedAt(rs.getTimestamp("created_at").toInstant());
+                        t.setUpdatedAt(rs.getTimestamp("updated_at").toInstant());
+                    }
+                }
+
+                con.commit();
                 return t;
+            } catch (SQLException ex) {
+                con.rollback();
+                throw ex;
+            } finally {
+                con.setAutoCommit(true);
             }
         }
     }
 
     public void deleteTask(long taskId) throws SQLException {
-        String sql = "DELETE FROM tasks WHERE id = ?";
-        try (Connection con = cm.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, taskId);
-            ps.executeUpdate();
+        String selectSql = "SELECT column_id, position FROM tasks WHERE id = ?";
+        String deleteSql = "DELETE FROM tasks WHERE id = ?";
+        String shiftSql  = "UPDATE tasks SET position = position - 1 WHERE column_id = ? AND position > ?";
+
+        try (Connection con = cm.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                Long columnId = null;
+                Integer position = null;
+
+                try (PreparedStatement ps = con.prepareStatement(selectSql)) {
+                    ps.setLong(1, taskId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            columnId = rs.getLong("column_id");
+                            position = rs.getInt("position");
+                        }
+                    }
+                }
+
+                if (columnId == null || position == null) {
+                    con.commit();
+                    return;
+                }
+
+                try (PreparedStatement ps = con.prepareStatement(deleteSql)) {
+                    ps.setLong(1, taskId);
+                    ps.executeUpdate();
+                }
+
+                try (PreparedStatement ps = con.prepareStatement(shiftSql)) {
+                    ps.setLong(1, columnId);
+                    ps.setInt(2, position);
+                    ps.executeUpdate();
+                }
+
+                con.commit();
+            } catch (SQLException ex) {
+                con.rollback();
+                throw ex;
+            } finally {
+                con.setAutoCommit(true);
+            }
         }
     }
+
 }

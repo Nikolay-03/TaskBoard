@@ -15,6 +15,7 @@
 
 	const { column, handleDndFinalizeCards, handleDndConsiderCards, flipDurationMs }: Props =
 		$props();
+
 </script>
 
 <Card class="h-full border-2 border-dashed">

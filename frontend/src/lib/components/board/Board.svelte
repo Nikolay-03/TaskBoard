@@ -3,13 +3,16 @@
 	import { BoardColumn } from '$lib/components/board';
 	import { flip } from 'svelte/animate';
 	import type { IColumn } from '$api/column';
+	import {useUpdateTask} from "$api/task";
+	import {getRequestErrorMessage} from "$lib/utils";
+	import {toast} from "svelte-sonner";
 
 	interface Props {
 		columnItems: IColumn[];
 	}
 
-	let { columnItems }: Props = $props();
-
+	let { columnItems= $bindable() }: Props = $props();
+	const updateTaskMutation = useUpdateTask();
 	function handleDndConsiderColumns(e: CustomEvent) {
 		columnItems = e.detail.items;
 	}
@@ -26,11 +29,35 @@
 		columnItems = [...columnItems];
 	}
 
-	function handleDndFinalizeCards(cid: number, e: CustomEvent) {
+	const handleDndFinalizeCards = async (cid: number, e: CustomEvent) => {
+		const { items, info } = e.detail;
 		const colIdx = columnItems.findIndex((c) => c.id === cid);
-		columnItems[colIdx].tasks = e.detail.items;
+		const taskId = info.id;
+
+		columnItems[colIdx].tasks = items;
 		columnItems = [...columnItems];
-	}
+
+		const isInThisColumn = items.some((t) => t.id === taskId);
+		if (!isInThisColumn) {
+			return;
+		}
+
+		const newPosition = items.findIndex((t) => t.id === taskId) + 1;
+
+		try {
+			await updateTaskMutation.mutateAsync({
+				id: taskId,
+				body: {
+					columnId: cid,
+					position: newPosition
+				}
+			});
+		} catch (err) {
+			const errorMessage = getRequestErrorMessage(err);
+			toast.error(errorMessage);
+		}
+	};
+
 </script>
 
 <section
@@ -39,7 +66,6 @@
 		items: columnItems,
 		flipDurationMs,
 		type: 'columns',
-		dropTargetClasses: ['!outline-none']
 	}}
 	on:consider={handleDndConsiderColumns}
 	on:finalize={handleDndFinalizeColumns}

@@ -2,8 +2,16 @@
 	import { Board } from '$lib/components/board';
 	import { useBoard } from '$api/board';
 	import { Spinner } from '$lib/ui/spinner';
+	import type {IColumn} from "$api/column";
 
 	const board = useBoard(1);
+	let columnItems: IColumn[] = $state([]);
+
+	$effect(() => {
+		if (board.data) {
+			columnItems = board.data.columns;
+		}
+	});
 </script>
 
 <div class="flex flex-1 flex-col gap-5">
@@ -19,6 +27,6 @@
 		</div>
 	{:else if board.data}
 		<h1 class="text-2xl font-semibold">{board.data.title}</h1>
-		<Board columnItems={board.data.columns} />
+		<Board bind:columnItems/>
 	{/if}
 </div>
