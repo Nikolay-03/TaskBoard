@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {CalendarIcon} from '@lucide/svelte';
+	import { CalendarIcon } from '@lucide/svelte';
 	import { getLocalTimeZone, today, type CalendarDate } from '@internationalized/date';
 	import { Label } from '$lib/ui/label';
 	import { PopoverTrigger, Popover, PopoverContent } from '$lib/ui/popover';

@@ -1,1 +1,1 @@
-export {default as ColumnActionModal} from './ColumnActionModal.svelte'
+export { default as ColumnActionModal } from './ColumnActionModal.svelte';

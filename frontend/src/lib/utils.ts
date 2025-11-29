@@ -14,4 +14,4 @@ export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?:
 
 export const getRequestErrorMessage = (err: unknown) => {
 	return err instanceof Error ? err.message : '';
-}
+};

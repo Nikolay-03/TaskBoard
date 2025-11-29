@@ -9,7 +9,7 @@ export const useBoard = (id: number) =>
 		queryKey: ['board', id],
 		queryFn: () => api.get(`/boards/${id}`),
 		refetchOnMount: false,
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: false
 	}));
 
 export const useMembers = (id: number) =>

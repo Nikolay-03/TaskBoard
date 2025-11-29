@@ -2,7 +2,7 @@
 	import { Board } from '$lib/components/board';
 	import { useBoard } from '$api/board';
 	import { Spinner } from '$lib/ui/spinner';
-	import type {IColumn} from "$api/column";
+	import type { IColumn } from '$api/column';
 
 	const board = useBoard(1);
 	let columnItems: IColumn[] = $state([]);
@@ -27,6 +27,6 @@
 		</div>
 	{:else if board.data}
 		<h1 class="text-2xl font-semibold">{board.data.title}</h1>
-		<Board bind:columnItems boardId={board.data.id}/>
+		<Board bind:columnItems boardId={board.data.id} />
 	{/if}
 </div>
