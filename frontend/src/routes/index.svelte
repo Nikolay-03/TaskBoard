@@ -27,6 +27,6 @@
 		</div>
 	{:else if board.data}
 		<h1 class="text-2xl font-semibold">{board.data.title}</h1>
-		<Board bind:columnItems/>
+		<Board bind:columnItems boardId={board.data.id}/>
 	{/if}
 </div>

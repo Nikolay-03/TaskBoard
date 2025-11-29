@@ -136,7 +136,7 @@
                 {#if error}
                     <div class="text-sm text-destructive" transition:fade>{error}</div>
                 {/if}
-                <Button type="submit" class="ml-auto" disabled={createTaskMutation.isPending}>
+                <Button type="submit" class="ml-auto" disabled={createTaskMutation.isPending || updateTaskMutation.isPending}>
                     {mode === 'create' ? "Create" : "Edit"}
                 </Button>
             </div>
