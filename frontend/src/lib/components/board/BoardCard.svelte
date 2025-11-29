@@ -7,8 +7,34 @@
 	import { type ITask } from '$api/task';
 	import { Button } from '$lib/ui/button';
 
-	let task: ITask = $props();
-	let { id, columnId, boardId, title, description, labels, assignees } = task;
+	let {
+		id,
+		columnId,
+		boardId,
+		title,
+		description,
+		labels,
+		assignees,
+		position,
+		createdAt,
+		updatedAt,
+		dueDate,
+		participants
+	}: ITask = $props();
+    const defaultValues = {
+        id,
+        columnId,
+        boardId,
+        description,
+        title,
+        labels,
+        assignees,
+        dueDate,
+        createdAt,
+        updatedAt,
+        position,
+        participants
+    };
 </script>
 
 <TaskModal {id}>
@@ -18,7 +44,12 @@
 				<div class="flex justify-between gap-2">
 					<CardTitle>{title}</CardTitle>
 					<div class="flex gap-3">
-						<TaskActionModal {columnId} {boardId} mode="edit" defaultValues={{ ...task }}>
+						<TaskActionModal
+							{columnId}
+							{boardId}
+							mode="edit"
+                            {defaultValues}
+						>
 							{#snippet trigger(props)}
 								<Button {...props} variant="clean" size="fit">
 									<PencilIcon class="text-muted-foreground" />
