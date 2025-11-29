@@ -112,7 +112,7 @@ public class BoardService {
         boardRepository.deleteBoard(boardId);
     }
 
-    public Column createColumn(long boardId, long userId, String title, int position)
+    public Column createColumn(long boardId, long userId, String title, Integer position)
             throws SQLException, IllegalAccessException {
         Board board = boardRepository.findBoardById(boardId);
         if (board == null) throw new NoSuchElementException("Board not found");
