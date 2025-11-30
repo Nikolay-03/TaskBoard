@@ -3,7 +3,7 @@
 	import { CirclePlus } from '@lucide/svelte';
 	import { BoardColumn } from '$lib/components/board';
 	import { flip } from 'svelte/animate';
-	import {type IColumn, useUpdateColumn} from '$api/column';
+	import { type IColumn, useUpdateColumn } from '$api/column';
 	import { type ITask, useUpdateTask } from '$api/task';
 	import { getRequestErrorMessage } from '$lib/utils';
 	import { toast } from 'svelte-sonner';
@@ -18,7 +18,7 @@
 	let { columnItems = $bindable(), boardId }: Props = $props();
 
 	const updateTaskMutation = useUpdateTask();
-	const updateColumnMutation = useUpdateColumn()
+	const updateColumnMutation = useUpdateColumn();
 
 	function handleDndConsiderColumns(e: CustomEvent) {
 		columnItems = e.detail.items;
@@ -26,7 +26,7 @@
 
 	async function handleDndFinalizeColumns(e: CustomEvent) {
 		columnItems = e.detail.items;
-		const colId = e.detail.info.id
+		const colId = e.detail.info.id;
 		const newPosition = columnItems.findIndex((c: IColumn) => c.id === colId) + 1;
 
 		try {
@@ -50,7 +50,7 @@
 		columnItems = [...columnItems];
 	}
 
-	async function handleDndFinalizeCards(cid: number, e: CustomEvent){
+	async function handleDndFinalizeCards(cid: number, e: CustomEvent) {
 		const { items, info } = e.detail;
 		const colIdx = columnItems.findIndex((c) => c.id === cid);
 		const taskId = info.id;
@@ -77,7 +77,7 @@
 			const errorMessage = getRequestErrorMessage(err);
 			toast.error(errorMessage);
 		}
-	};
+	}
 </script>
 
 <section

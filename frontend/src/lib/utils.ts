@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import {DateFormatter, parseAbsoluteToLocal} from "@internationalized/date";
+import { DateFormatter, parseAbsoluteToLocal } from '@internationalized/date';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -18,11 +18,11 @@ export const getRequestErrorMessage = (err: unknown) => {
 };
 
 export const formatUtcDate = (date: string) => {
-	const formatter = new DateFormatter("ru-RU", {
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric"
+	const formatter = new DateFormatter('ru-RU', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric'
 	});
 
 	return formatter.format(parseAbsoluteToLocal(date).toDate());
-}
+};

@@ -3,7 +3,7 @@
 	import { flip } from 'svelte/animate';
 	import { dndzone } from 'svelte-dnd-action';
 	import { type IColumn } from '$api/column';
-	import {AddTaskButton, TaskActionModal, TaskCard} from '$lib/components/tasks';
+	import { AddTaskButton, TaskActionModal, TaskCard } from '$lib/components/tasks';
 	import { Button } from '$lib/ui/button';
 	import { CogIcon } from '@lucide/svelte';
 	import { ColumnActionModal } from '$lib/components/columns';

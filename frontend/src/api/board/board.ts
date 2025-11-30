@@ -1,6 +1,5 @@
 import type { IColumn } from '$api/column';
 
-
 export interface IBoard {
 	id: number;
 	ownerId: number;
@@ -27,7 +26,7 @@ export interface IUpdateBoardVariables {
 	body: Partial<IUpdateBoardBody>;
 }
 export interface OptimisticContext {
-	previousBoards?: IBoard[]
-	previousBoard?: IBoardView
-	previousFavorites?: IBoard[]
+	previousBoards?: IBoard[];
+	previousBoard?: IBoardView;
+	previousFavorites?: IBoard[];
 }

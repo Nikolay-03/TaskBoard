@@ -21,20 +21,20 @@
 		dueDate,
 		participants
 	}: ITask = $props();
-    const defaultValues = {
-        id,
-        columnId,
-        boardId,
-        description,
-        title,
-        labels,
-        assignees,
-        dueDate,
-        createdAt,
-        updatedAt,
-        position,
-        participants
-    };
+	const defaultValues = {
+		id,
+		columnId,
+		boardId,
+		description,
+		title,
+		labels,
+		assignees,
+		dueDate,
+		createdAt,
+		updatedAt,
+		position,
+		participants
+	};
 </script>
 
 <TaskModal {id}>
@@ -44,12 +44,7 @@
 				<div class="flex justify-between gap-2">
 					<CardTitle>{title}</CardTitle>
 					<div class="flex gap-3">
-						<TaskActionModal
-							{columnId}
-							{boardId}
-							mode="edit"
-                            {defaultValues}
-						>
+						<TaskActionModal {columnId} {boardId} mode="edit" {defaultValues}>
 							{#snippet trigger(props)}
 								<Button {...props} variant="clean" size="fit">
 									<PencilIcon class="text-muted-foreground" />

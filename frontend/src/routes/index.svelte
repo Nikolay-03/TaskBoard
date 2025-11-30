@@ -1,12 +1,11 @@
 <script lang="ts">
-	import {CirclePlus} from '@lucide/svelte'
-	import {BoardActionModal, BoardCard} from '$lib/components/board';
-	import {useGetBoards} from '$api/board';
+	import { CirclePlus } from '@lucide/svelte';
+	import { BoardActionModal, BoardCard } from '$lib/components/board';
+	import { useGetBoards } from '$api/board';
 	import { Spinner } from '$lib/ui/spinner';
-	import {Button} from "$lib/ui/button";
+	import { Button } from '$lib/ui/button';
 
 	const boards = useGetBoards();
-
 </script>
 
 <div class="flex flex-1 flex-col gap-5">
@@ -23,15 +22,15 @@
 		</div>
 	{:else if boards.data}
 		<div class="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4">
-		{#each boards.data as board (board.id)}
-				<BoardCard {...board}/>
+			{#each boards.data as board (board.id)}
+				<BoardCard {...board} />
 			{/each}
 			<BoardActionModal>
 				{#snippet trigger(props)}
 					<Button
-							{...props}
-							class="flex w-full h-full min-h-[200px] flex-col gap-3 border-2 border-dashed px-3"
-							variant="outline"
+						{...props}
+						class="flex h-full min-h-[200px] w-full flex-col gap-3 border-2 border-dashed px-3"
+						variant="outline"
 					>
 						<CirclePlus class="size-10 text-muted-foreground" />
 					</Button>
