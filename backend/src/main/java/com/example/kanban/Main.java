@@ -25,10 +25,11 @@ public class Main {
         ColumnRepository columnRepo = new ColumnRepository(cm);
         TaskRepository taskRepo = new TaskRepository(cm);
         BoardMemberRepository boardMemberRepo = new BoardMemberRepository(cm);
+        BoardFavoriteRepository boardFavoriteRepo = new BoardFavoriteRepository(cm);
 
         AuthService authService = new AuthService(userRepo, sessionRepo);
         BoardService boardService = new BoardService(
-                boardRepo, columnRepo, taskRepo, assigneeRepo, participantRepo, labelRepo, boardMemberRepo
+                boardRepo, columnRepo, taskRepo, assigneeRepo, participantRepo, labelRepo, boardMemberRepo, boardFavoriteRepo
         );
         TaskHandler taskHandler = new TaskHandler(
                 authService,

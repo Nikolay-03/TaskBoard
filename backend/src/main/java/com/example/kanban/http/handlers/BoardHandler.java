@@ -74,6 +74,22 @@ public class BoardHandler implements HttpHandler {
             ) {
                 long boardId = Long.parseLong(parts[3]);
                 handleDeleteBoard(exchange, boardId);
+            } else if ("POST".equalsIgnoreCase(method)
+                    && parts.length == 5
+                    && "api".equals(parts[1])
+                    && "boards".equals(parts[2])
+                    && "favorite".equals(parts[4])
+            ) {
+                long boardId = Long.parseLong(parts[3]);
+                handleAddFavorite(exchange, boardId);
+            } else if ("DELETE".equalsIgnoreCase(method)
+                    && parts.length == 5
+                    && "api".equals(parts[1])
+                    && "boards".equals(parts[2])
+                    && "favorite".equals(parts[4])
+            ) {
+                long boardId = Long.parseLong(parts[3]);
+                handleRemoveFavorite(exchange, boardId);
             }
             else {
                 sendError(exchange, 404, "Not found");
@@ -174,6 +190,34 @@ public class BoardHandler implements HttpHandler {
 
         try {
             boardService.deleteBoard(boardId, user.getId());
+            ex.sendResponseHeaders(204, -1);
+        } catch (NoSuchElementException e) {
+            sendError(ex, 404, "Board not found");
+        } catch (IllegalAccessException e) {
+            sendError(ex, 403, "Access denied");
+        }
+    }
+
+    private void handleAddFavorite(HttpExchange ex, long boardId) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+
+        try {
+            boardService.addFavorite(boardId, user.getId());
+            ex.sendResponseHeaders(204, -1);
+        } catch (NoSuchElementException e) {
+            sendError(ex, 404, "Board not found");
+        } catch (IllegalAccessException e) {
+            sendError(ex, 403, "Access denied");
+        }
+    }
+
+    private void handleRemoveFavorite(HttpExchange ex, long boardId) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+
+        try {
+            boardService.removeFavorite(boardId, user.getId());
             ex.sendResponseHeaders(204, -1);
         } catch (NoSuchElementException e) {
             sendError(ex, 404, "Board not found");

@@ -269,6 +269,72 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /api/boards/{boardId}/favorite:
+    post:
+      summary: Добавить доску в избранное
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Доска добавлена в избранное
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Доска не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Удалить доску из избранного
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Доска удалена из избранного
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Доска не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /api/tasks/{columnId}:
     post:
       summary: Создать задачу в столбце
@@ -714,6 +780,10 @@ components:
         updatedAt:
           type: string
           format: date-time
+        isFavorite:
+          type: boolean
+          nullable: true
+          description: Является ли доска избранной для текущего пользователя
 
     CreateBoardRequest:
       type: object

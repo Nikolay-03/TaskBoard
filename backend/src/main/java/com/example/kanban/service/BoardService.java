@@ -16,13 +16,16 @@ public class BoardService {
     private final TaskParticipantRepository taskParticipantRepository;
     private final TaskLabelRepository taskLabelRepository;
     private final BoardMemberRepository boardMemberRepository;
+    private final BoardFavoriteRepository boardFavoriteRepository;
 
     public BoardService(BoardRepository boardRepository,
                         ColumnRepository columnRepository,
                         TaskRepository taskRepository,
                         TaskAssigneeRepository taskAssigneeRepository,
                         TaskParticipantRepository taskParticipantRepository,
-                        TaskLabelRepository taskLabelRepository, BoardMemberRepository boardMemberRepository) {
+                        TaskLabelRepository taskLabelRepository,
+                        BoardMemberRepository boardMemberRepository,
+                        BoardFavoriteRepository boardFavoriteRepository) {
         this.boardRepository = boardRepository;
         this.columnRepository = columnRepository;
         this.taskRepository = taskRepository;
@@ -30,6 +33,7 @@ public class BoardService {
         this.taskParticipantRepository = taskParticipantRepository;
         this.taskLabelRepository = taskLabelRepository;
         this.boardMemberRepository = boardMemberRepository;
+        this.boardFavoriteRepository = boardFavoriteRepository;
     }
 
     public List<Board> getBoardsByOwner(long ownerId) throws SQLException {
@@ -145,6 +149,28 @@ public class BoardService {
     }
 
     public List<Board> getBoardsByMember(long userId) throws SQLException {
-        return boardRepository.findBoardsByMember(userId);
+        List<Board> boards = boardRepository.findBoardsByMember(userId);
+        for (Board board : boards) {
+            board.setIsFavorite(boardFavoriteRepository.isFavorite(board.getId(), userId));
+        }
+        return boards;
+    }
+
+    public void addFavorite(long boardId, long userId) throws SQLException, IllegalAccessException {
+        Board board = boardRepository.findBoardById(boardId);
+        if (board == null) throw new NoSuchElementException("Board not found");
+        if (board.getOwnerId() != userId && !boardMemberRepository.isMember(boardId, userId)) {
+            throw new IllegalAccessException("Forbidden");
+        }
+        boardFavoriteRepository.addFavorite(boardId, userId);
+    }
+
+    public void removeFavorite(long boardId, long userId) throws SQLException, IllegalAccessException {
+        Board board = boardRepository.findBoardById(boardId);
+        if (board == null) throw new NoSuchElementException("Board not found");
+        if (board.getOwnerId() != userId && !boardMemberRepository.isMember(boardId, userId)) {
+            throw new IllegalAccessException("Forbidden");
+        }
+        boardFavoriteRepository.removeFavorite(boardId, userId);
     }
 }

@@ -9,6 +9,7 @@ public class Board {
     private String description;
     private Instant createdAt;
     private Instant updatedAt;
+    private Boolean isFavorite;
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
@@ -27,4 +28,7 @@ public class Board {
 
     public Instant getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+
+    public Boolean getIsFavorite() { return isFavorite; }
+    public void setIsFavorite(Boolean isFavorite) { this.isFavorite = isFavorite; }
 }
