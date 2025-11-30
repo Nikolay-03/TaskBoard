@@ -1,5 +1,4 @@
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
-import Kanban from '@lucide/svelte/icons/layout-panel-left';
 import Star from '@lucide/svelte/icons/star';
 import Settings from '@lucide/svelte/icons/settings';
 import type { Component } from 'svelte';
@@ -20,18 +19,12 @@ export const menuItems: IMenuItem[] = [
 	},
 	{
 		id: '2',
-		name: 'Boards',
-		href: '/boards',
-		icon: Kanban
-	},
-	{
-		id: '3',
 		name: 'Favorites',
 		href: '/favorites',
 		icon: Star
 	},
 	{
-		id: '4',
+		id: '3',
 		name: 'Settings',
 		href: '/settings',
 		icon: Settings
