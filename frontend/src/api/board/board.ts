@@ -8,6 +8,7 @@ export interface IBoard {
 	description: string;
 	createdAt: string;
 	updatedAt: string;
+	isFavorite: boolean;
 }
 export interface IBoardView extends IBoard {
 	columns: IColumn[];

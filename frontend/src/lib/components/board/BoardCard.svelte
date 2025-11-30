@@ -1,16 +1,44 @@
 <script lang="ts">
+    import {StarIcon} from '@lucide/svelte'
     import {CardDescription, CardFooter, CardHeader, CardTitle, Card} from "$lib/ui/card/index.js";
-    import type {IBoard} from "$api/board";
-    import {formatUtcDate} from "$lib/utils";
+    import {type IBoard, useAddBoardToFavorites, useDeleteBoardFromFavorites} from "$api/board";
+    import {formatUtcDate, getRequestErrorMessage} from "$lib/utils";
     import {navigate} from "sv-router/generated";
-    let {title, description, createdAt, id}: IBoard = $props()
-
+    import {Button} from "$lib/ui/button";
+    import {toast} from "svelte-sonner";
+    let {title, description, createdAt, id, isFavorite}: IBoard = $props()
     const formattedDate = formatUtcDate(createdAt)
+
+    const addToFavorites = useAddBoardToFavorites()
+    const deleteFromFavorites = useDeleteBoardFromFavorites()
+    const handleToggleFavorite = async (e: MouseEvent) => {
+        e.stopPropagation()
+        try{
+            if(isFavorite){
+                await deleteFromFavorites.mutateAsync(id)
+            }
+            else {
+                await addToFavorites.mutateAsync(id)
+            }
+        }
+        catch (e) {
+            toast.error(getRequestErrorMessage(e))
+        }
+    }
 </script>
 
 <Card class="w-full h-[200px] cursor-pointer" onclick={() => navigate(`/boards/${id}`, {viewTransition: true})}>
     <CardHeader>
-        <CardTitle class="text-xl">{title}</CardTitle>
+        <div class="flex justify-between">
+            <CardTitle class="text-xl">{title}</CardTitle>
+            <Button
+                    variant="clean"
+                    size="fit"
+                    onclick={handleToggleFavorite}
+            >
+                <StarIcon class={[{"fill-white": isFavorite}]}/>
+            </Button>
+        </div>
         <CardDescription class="text-base">{description}</CardDescription>
     </CardHeader>
     <CardFooter class="text-muted-foreground ml-auto mt-auto">

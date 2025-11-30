@@ -94,8 +94,8 @@ public class BoardService {
         view.setDescription(board.getDescription());
         view.setCreatedAt(board.getCreatedAt());
         view.setUpdatedAt(board.getUpdatedAt());
+        view.setIsFavorite(boardFavoriteRepository.isFavorite(view.getId(), userId));
         view.setColumns(columnViews);
-
         return view;
     }
 

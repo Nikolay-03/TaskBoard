@@ -1,6 +1,6 @@
 import {createMutation, createQuery} from '@tanstack/svelte-query';
 import type {IBoard, IBoardView, ICreateBoardBody, IUpdateBoardVariables} from './board';
-import {api} from '$api';
+import {api, queryClient} from '$api';
 import type {IUser} from '$api/user';
 
 export * from './board';
@@ -36,3 +36,28 @@ export const useDeleteBoard = () =>
         mutationKey: ['deleteBoard'],
         mutationFn: (id) => api.delete(`/boards/${id}`)
     }));
+
+export const useAddBoardToFavorites = () => createMutation<void, Error, number>(() => ({
+    mutationKey: ['addBoardToFavorite'],
+    mutationFn: (id) => api.post(`/boards/${id}/favorite`),
+    onMutate: optimisticFavoritesAction,
+}))
+export const useDeleteBoardFromFavorites = () => createMutation<void, Error, number>(() => ({
+    mutationKey: ['addBoardToFavorite'],
+    mutationFn: (id) => api.delete(`/boards/${id}/favorite`),
+    onMutate: optimisticFavoritesAction,
+}))
+
+const optimisticFavoritesAction = async (id: number) => {
+    await queryClient.cancelQueries({ queryKey: ['boards'] })
+    const previousBoards: IBoard[] | undefined = queryClient.getQueryData(['boards'])
+    const updatedBoards = previousBoards?.map(board => {
+        if (board.id === id) {
+            return {...board, isFavorite: !board.isFavorite};
+        }
+        return board;
+    })
+    queryClient.setQueryData(['boards'], () => updatedBoards)
+
+    return { previousBoards }
+}
