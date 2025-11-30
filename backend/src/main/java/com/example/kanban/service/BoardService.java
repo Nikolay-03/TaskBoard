@@ -173,4 +173,12 @@ public class BoardService {
         }
         boardFavoriteRepository.removeFavorite(boardId, userId);
     }
+
+    public List<Board> getFavoriteBoards(long userId) throws SQLException {
+        List<Board> boards = boardRepository.findFavoriteBoardsByUser(userId);
+        for (Board board : boards) {
+            board.setIsFavorite(true);
+        }
+        return boards;
+    }
 }

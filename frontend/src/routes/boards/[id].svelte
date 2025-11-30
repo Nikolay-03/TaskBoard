@@ -40,7 +40,7 @@
 </script>
 
 <div class="flex flex-1 flex-col gap-5">
-    {#if board.isFetching}
+    {#if board.isLoading}
         <div class="flex h-full w-full flex-col items-center justify-center">
             <Spinner class="size-15" />
         </div>

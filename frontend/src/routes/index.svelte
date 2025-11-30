@@ -11,7 +11,7 @@
 
 <div class="flex flex-1 flex-col gap-5">
 	<h1 class="text-2xl font-semibold">Your boards</h1>
-	{#if boards.isFetching}
+	{#if boards.isLoading}
 		<div class="flex h-full w-full flex-col items-center justify-center">
 			<Spinner class="size-15" />
 		</div>

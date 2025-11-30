@@ -152,4 +152,32 @@ public class BoardRepository {
         }
         return list;
     }
+
+    public List<Board> findFavoriteBoardsByUser(long userId) throws SQLException {
+        String sql = """
+            SELECT b.id, b.owner_id, b.title, b.description, b.created_at, b.updated_at
+            FROM boards b
+            INNER JOIN board_favorites bf ON b.id = bf.board_id
+            WHERE bf.user_id = ?
+            ORDER BY b.id
+            """;
+        List<Board> list = new ArrayList<>();
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Board b = new Board();
+                    b.setId(rs.getLong("id"));
+                    b.setOwnerId(rs.getLong("owner_id"));
+                    b.setTitle(rs.getString("title"));
+                    b.setDescription(rs.getString("description"));
+                    b.setCreatedAt(rs.getTimestamp("created_at").toInstant());
+                    b.setUpdatedAt(rs.getTimestamp("updated_at").toInstant());
+                    list.add(b);
+                }
+            }
+        }
+        return list;
+    }
 }

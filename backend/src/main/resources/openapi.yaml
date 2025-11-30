@@ -155,6 +155,28 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /api/boards/favorites:
+    get:
+      summary: Получить список избранных досок
+      description: Возвращает все доски, добавленные пользователем в избранное
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Список избранных досок
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Board'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /api/boards/{boardId}:
     get:
       summary: Получить доску с колонками и задачами

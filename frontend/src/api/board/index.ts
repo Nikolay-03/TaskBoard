@@ -1,5 +1,11 @@
 import {createMutation, createQuery} from '@tanstack/svelte-query';
-import type {IBoard, IBoardView, ICreateBoardBody, IUpdateBoardVariables} from './board';
+import type {
+    IBoard,
+    IBoardView,
+    ICreateBoardBody,
+    IUpdateBoardVariables,
+    OptimisticContext
+} from './board';
 import {api, queryClient} from '$api';
 import type {IUser} from '$api/user';
 
@@ -36,24 +42,61 @@ export const useDeleteBoard = () =>
         mutationKey: ['deleteBoard'],
         mutationFn: (id) => api.delete(`/boards/${id}`)
     }));
-
-export const useAddBoardToFavorites = () => createMutation<void, Error, number>(() => ({
-    mutationKey: ['addBoardToFavorite'],
+export const useGetFavorites = () => createQuery<void, Error, IBoard[]>(() => ({
+    queryKey: ['favorites'],
+    queryFn: () => api.get('/boards/favorites')
+}))
+export const useAddBoardToFavorites = () => createMutation<void, Error, number, OptimisticContext>(() => ({
+    mutationKey: ['addBoardToFavorites'],
     mutationFn: (id) => api.post(`/boards/${id}/favorite`),
     onMutate: optimisticFavoritesAction,
+    onError: (err, id, context) => {
+        if (context?.previousBoards) {
+            queryClient.setQueryData(['boards'], context.previousBoards);
+        }
+        if (context?.previousBoard) {
+            queryClient.setQueryData(['board', id], context.previousBoard);
+        }
+        if (context?.previousFavorites) {
+            queryClient.setQueryData(['favorites'], context.previousFavorites);
+        }
+    },
+    onSettled: (_data, _error, id) => {
+        queryClient.invalidateQueries({ queryKey: ['boards'] });
+        queryClient.invalidateQueries({ queryKey: ['board', id] });
+        queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    },
 }))
-export const useDeleteBoardFromFavorites = () => createMutation<void, Error, number>(() => ({
-    mutationKey: ['addBoardToFavorite'],
+export const useDeleteBoardFromFavorites = () => createMutation<void, Error, number, OptimisticContext>(() => ({
+    mutationKey: ['deleteBoardFromFavorites'],
     mutationFn: (id) => api.delete(`/boards/${id}/favorite`),
     onMutate: optimisticFavoritesAction,
+    onError: (err, id, context) => {
+        if (context?.previousBoards) {
+            queryClient.setQueryData(['boards'], context.previousBoards);
+        }
+        if (context?.previousBoard) {
+            queryClient.setQueryData(['board', id], context.previousBoard);
+        }
+        if (context?.previousFavorites) {
+            queryClient.setQueryData(['favorites'], context.previousFavorites);
+        }
+    },
+    onSettled: (_data, _error, id) => {
+        queryClient.invalidateQueries({ queryKey: ['boards'] });
+        queryClient.invalidateQueries({ queryKey: ['board', id] });
+        queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    },
 }))
 
 const optimisticFavoritesAction = async (id: number) => {
     await queryClient.cancelQueries({ queryKey: ['boards'] })
     await queryClient.cancelQueries({ queryKey: ['board', id] })
+    await queryClient.cancelQueries({queryKey: ['favorites']})
 
     const previousBoards = queryClient.getQueryData<IBoard[]>(['boards']);
     const previousBoard = queryClient.getQueryData<IBoardView>(['board', id]);
+    const previousFavorites = queryClient.getQueryData<IBoard[]>(['favorites'])
 
     const updatedBoards = previousBoards?.map(board =>
         board.id === id ? { ...board, isFavorite: !board.isFavorite } : board
@@ -63,6 +106,8 @@ const optimisticFavoritesAction = async (id: number) => {
         ? { ...previousBoard, isFavorite: !previousBoard.isFavorite }
         : undefined;
 
+    const updatedFavorites = previousFavorites?.filter(board => board.id !== id);
+
     if (updatedBoards) {
         queryClient.setQueryData(['boards'], updatedBoards);
     }
@@ -70,6 +115,9 @@ const optimisticFavoritesAction = async (id: number) => {
     if (updatedBoard) {
         queryClient.setQueryData(['board', id], updatedBoard);
     }
+    if (updatedFavorites) {
+        queryClient.setQueryData(['favorites'], updatedFavorites);
+    }
 
-    return { previousBoards, previousBoard };
+    return { previousBoards, previousBoard, previousFavorites } satisfies OptimisticContext;
 };

@@ -39,6 +39,13 @@ public class BoardHandler implements HttpHandler {
                 && "boards".equals(parts[2])
             ) {
                 handleGetBoards(exchange);
+            } else if ("GET".equalsIgnoreCase(method)
+                    && parts.length == 4
+                    && "api".equals(parts[1])
+                    && "boards".equals(parts[2])
+                    && "favorites".equals(parts[3])
+            ) {
+                handleGetFavoriteBoards(exchange);
             } else if ("POST".equalsIgnoreCase(method)
                     && parts.length == 3
                     && "api".equals(parts[1])
@@ -106,6 +113,23 @@ public class BoardHandler implements HttpHandler {
 
         try {
             List<Board> boards = boardService.getBoardsByMember(user.getId());
+
+            ex.sendResponseHeaders(200, 0);
+            try (OutputStream os = ex.getResponseBody()) {
+                JsonUtils.writeJson(os, boards);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendError(ex, 500, "Internal server error");
+        }
+    }
+
+    private void handleGetFavoriteBoards(HttpExchange ex) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+
+        try {
+            List<Board> boards = boardService.getFavoriteBoards(user.getId());
 
             ex.sendResponseHeaders(200, 0);
             try (OutputStream os = ex.getResponseBody()) {

@@ -26,3 +26,8 @@ export interface IUpdateBoardVariables {
 	id: number;
 	body: Partial<IUpdateBoardBody>;
 }
+export interface OptimisticContext {
+	previousBoards?: IBoard[]
+	previousBoard?: IBoardView
+	previousFavorites?: IBoard[]
+}
