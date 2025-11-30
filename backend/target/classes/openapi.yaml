@@ -108,6 +108,53 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /api/boards:
+    get:
+      summary: Получить список досок
+      description: Возвращает все доски, где пользователь является владельцем или участником
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Список досок
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Board'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: Создать доску
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBoardRequest'
+      responses:
+        '201':
+          description: Доска создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Board'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /api/boards/{boardId}:
     get:
       summary: Получить доску с колонками и задачами
@@ -129,6 +176,82 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BoardView'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Доска не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      summary: Обновить доску
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBoardRequest'
+      responses:
+        '200':
+          description: Доска обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Board'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Доска не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      summary: Удалить доску
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Доска удалена
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -570,6 +693,51 @@ components:
         Полное представление доски (структура зависит от реализации BoardView на бэкенде).
         Здесь описан как "произвольный объект".
       additionalProperties: true
+
+    Board:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        ownerId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateBoardRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          description: Название доски
+        description:
+          type: string
+          nullable: true
+          description: Описание доски
+
+    UpdateBoardRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          nullable: true
+          description: Новое название доски. Если не указано, останется прежним.
+        description:
+          type: string
+          nullable: true
+          description: Новое описание доски. Если не указано, останется прежним.
 
     Column:
       type: object

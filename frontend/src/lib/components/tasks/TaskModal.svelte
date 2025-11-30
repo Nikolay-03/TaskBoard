@@ -37,7 +37,7 @@
 				<Spinner class="size-10" />
 			</div>
 		{:else if taskQuery.error}
-			<p class="text-red-500" transition:fade>Ошибка: {taskQuery.error}</p>
+			<p class="text-red-500" transition:fade>Ошибка: {taskQuery.error.message}</p>
 		{:else if data}
 			<DialogHeader>
 				<DialogTitle>{data.title}</DialogTitle>

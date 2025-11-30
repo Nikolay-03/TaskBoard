@@ -33,4 +33,16 @@ public class BoardMemberRepository {
         }
         return members;
     }
+
+    public boolean isMember(long boardId, long userId) throws SQLException {
+        String sql = "SELECT 1 FROM board_members WHERE board_id = ? AND user_id = ?";
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, boardId);
+            ps.setLong(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
 }

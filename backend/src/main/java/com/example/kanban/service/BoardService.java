@@ -39,7 +39,9 @@ public class BoardService {
     public BoardView getBoardView(long boardId, long userId) throws SQLException, IllegalAccessException {
         Board board = boardRepository.findBoardById(boardId);
         if (board == null) throw new NoSuchElementException("Board not found");
-        if (board.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
+        if (board.getOwnerId() != userId && !boardMemberRepository.isMember(boardId, userId)) {
+            throw new IllegalAccessException("Forbidden");
+        }
 
         List<Column> columns = columnRepository.findByBoardId(boardId);
         List<Task> tasks = taskRepository.findByBoardId(boardId);
@@ -140,5 +142,9 @@ public class BoardService {
 
     public List<User> getMembers(long boardId) throws SQLException {
         return boardMemberRepository.getMembersByBoardId(boardId);
+    }
+
+    public List<Board> getBoardsByMember(long userId) throws SQLException {
+        return boardRepository.findBoardsByMember(userId);
     }
 }

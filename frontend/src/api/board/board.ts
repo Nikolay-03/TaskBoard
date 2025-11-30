@@ -1,5 +1,6 @@
 import type { IColumn } from '$api/column';
 
+
 export interface IBoard {
 	id: number;
 	ownerId: number;
@@ -7,5 +8,20 @@ export interface IBoard {
 	description: string;
 	createdAt: string;
 	updatedAt: string;
+}
+export interface IBoardView extends IBoard {
 	columns: IColumn[];
+}
+
+export interface ICreateBoardBody {
+	title: string;
+	description?: string;
+}
+interface IUpdateBoardBody {
+	title: string;
+	description: string;
+}
+export interface IUpdateBoardVariables {
+	id: number;
+	body: Partial<IUpdateBoardBody>;
 }

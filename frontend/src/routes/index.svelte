@@ -1,32 +1,42 @@
 <script lang="ts">
-	import { Board } from '$lib/components/board';
-	import { useBoard } from '$api/board';
+	import {CirclePlus} from '@lucide/svelte'
+	import {BoardActionModal, BoardCard} from '$lib/components/board';
+	import {useGetBoards} from '$api/board';
 	import { Spinner } from '$lib/ui/spinner';
-	import type { IColumn } from '$api/column';
+	import {Button} from "$lib/ui/button";
 
-	const board = useBoard(1);
-	let columnItems: IColumn[] = $state([]);
+	const boards = useGetBoards();
 
-	$effect(() => {
-		if (board.data) {
-			columnItems = board.data.columns;
-		}
-	});
 </script>
 
 <div class="flex flex-1 flex-col gap-5">
-	{#if board.isFetching}
+	<h1 class="text-2xl font-semibold">Your boards</h1>
+	{#if boards.isFetching}
 		<div class="flex h-full w-full flex-col items-center justify-center">
 			<Spinner class="size-15" />
 		</div>
-	{:else if board.error}
+	{:else if boards.error}
 		<div class="flex h-full w-full flex-col items-center justify-center">
 			<h1 class="text-4xl font-bold">
-				{board.error.message}
+				{boards.error.message}
 			</h1>
 		</div>
-	{:else if board.data}
-		<h1 class="text-2xl font-semibold">{board.data.title}</h1>
-		<Board bind:columnItems boardId={board.data.id} />
+	{:else if boards.data}
+		<div class="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4">
+		{#each boards.data as board (board.id)}
+				<BoardCard {...board}/>
+			{/each}
+			<BoardActionModal>
+				{#snippet trigger(props)}
+					<Button
+							{...props}
+							class="flex w-full h-full min-h-[200px] flex-col gap-3 border-2 border-dashed px-3"
+							variant="outline"
+					>
+						<CirclePlus class="size-10 text-muted-foreground" />
+					</Button>
+				{/snippet}
+			</BoardActionModal>
+		</div>
 	{/if}
 </div>

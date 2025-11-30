@@ -2,3 +2,4 @@ export { default as TaskModal } from './TaskModal.svelte';
 export { default as AddTaskButton } from './AddTaskButton.svelte';
 export { default as TaskActionModal } from './TaskActionModal.svelte';
 export { default as TaskBadges } from './shared/TaskBadges.svelte';
+export {default as TaskCard} from './TaskCard.svelte';

@@ -1,6 +1,7 @@
 package com.example.kanban.http.handlers;
 
 import com.example.kanban.http.JsonUtils;
+import com.example.kanban.model.Board;
 import com.example.kanban.model.BoardView;
 import com.example.kanban.model.User;
 import com.example.kanban.service.AuthService;
@@ -33,6 +34,18 @@ public class BoardHandler implements HttpHandler {
         try {
             String[] parts = path.split("/");
             if ("GET".equalsIgnoreCase(method)
+                && parts.length == 3
+                && "api".equals(parts[1])
+                && "boards".equals(parts[2])
+            ) {
+                handleGetBoards(exchange);
+            } else if ("POST".equalsIgnoreCase(method)
+                    && parts.length == 3
+                    && "api".equals(parts[1])
+                    && "boards".equals(parts[2])
+            ) {
+                handleCreateBoard(exchange);
+            } else if ("GET".equalsIgnoreCase(method)
                 && parts.length == 4
                 && "api".equals(parts[1])
                 && "boards".equals(parts[2])
@@ -47,7 +60,20 @@ public class BoardHandler implements HttpHandler {
             ) {
                 long boardId = Long.parseLong(parts[3]);
                 handleGetBoardMembers(exchange, boardId);
-
+            } else if ("PATCH".equalsIgnoreCase(method)
+                    && parts.length == 4
+                    && "api".equals(parts[1])
+                    && "boards".equals(parts[2])
+            ) {
+                long boardId = Long.parseLong(parts[3]);
+                handleUpdateBoard(exchange, boardId);
+            } else if ("DELETE".equalsIgnoreCase(method)
+                    && parts.length == 4
+                    && "api".equals(parts[1])
+                    && "boards".equals(parts[2])
+            ) {
+                long boardId = Long.parseLong(parts[3]);
+                handleDeleteBoard(exchange, boardId);
             }
             else {
                 sendError(exchange, 404, "Not found");
@@ -55,6 +81,46 @@ public class BoardHandler implements HttpHandler {
         } catch (Exception e) {
             e.printStackTrace();
             sendError(exchange, 500, "Internal server error");
+        }
+    }
+
+    private void handleGetBoards(HttpExchange ex) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+
+        try {
+            List<Board> boards = boardService.getBoardsByMember(user.getId());
+
+            ex.sendResponseHeaders(200, 0);
+            try (OutputStream os = ex.getResponseBody()) {
+                JsonUtils.writeJson(os, boards);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendError(ex, 500, "Internal server error");
+        }
+    }
+
+    private void handleCreateBoard(HttpExchange ex) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+
+        try {
+            CreateBoardRequest req = JsonUtils.readJson(ex.getRequestBody(), CreateBoardRequest.class);
+            if (req == null || req.title == null || req.title.isBlank()) {
+                sendError(ex, 400, "Title is required");
+                return;
+            }
+
+            Board board = boardService.createBoard(user.getId(), req.title, req.description);
+
+            ex.sendResponseHeaders(201, 0);
+            try (OutputStream os = ex.getResponseBody()) {
+                JsonUtils.writeJson(os, board);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendError(ex, 500, "Internal server error");
         }
     }
 
@@ -69,6 +135,46 @@ public class BoardHandler implements HttpHandler {
             try (OutputStream os = ex.getResponseBody()) {
                 JsonUtils.writeJson(os, view);
             }
+        } catch (NoSuchElementException e) {
+            sendError(ex, 404, "Board not found");
+        } catch (IllegalAccessException e) {
+            sendError(ex, 403, "Access denied");
+        }
+    }
+    private void handleUpdateBoard(HttpExchange ex, long boardId) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+
+        try {
+            UpdateBoardRequest req = JsonUtils.readJson(ex.getRequestBody(), UpdateBoardRequest.class);
+            if (req == null) {
+                sendError(ex, 400, "Invalid request");
+                return;
+            }
+
+            BoardView existingBoardView = boardService.getBoardView(boardId, user.getId());
+            String title = req.title != null ? req.title : existingBoardView.getTitle();
+            String description = req.description != null ? req.description : existingBoardView.getDescription();
+
+            Board updatedBoard = boardService.updateBoard(boardId, user.getId(), title, description);
+
+            ex.sendResponseHeaders(200, 0);
+            try (OutputStream os = ex.getResponseBody()) {
+                JsonUtils.writeJson(os, updatedBoard);
+            }
+        } catch (NoSuchElementException e) {
+            sendError(ex, 404, "Board not found");
+        } catch (IllegalAccessException e) {
+            sendError(ex, 403, "Access denied");
+        }
+    }
+    private void handleDeleteBoard(HttpExchange ex, long boardId) throws Exception {
+        User user = requireAuth(ex);
+        if (user == null) return;
+
+        try {
+            boardService.deleteBoard(boardId, user.getId());
+            ex.sendResponseHeaders(204, -1);
         } catch (NoSuchElementException e) {
             sendError(ex, 404, "Board not found");
         } catch (IllegalAccessException e) {
@@ -131,5 +237,15 @@ public class BoardHandler implements HttpHandler {
         try (OutputStream os = ex.getResponseBody()) {
             JsonUtils.writeJson(os, Map.of("error", msg));
         }
+    }
+
+    public static class CreateBoardRequest {
+        public String title;
+        public String description;
+    }
+
+    public static class UpdateBoardRequest {
+        public String title;
+        public String description;
     }
 }
