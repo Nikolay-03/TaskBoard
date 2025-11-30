@@ -50,14 +50,26 @@ export const useDeleteBoardFromFavorites = () => createMutation<void, Error, num
 
 const optimisticFavoritesAction = async (id: number) => {
     await queryClient.cancelQueries({ queryKey: ['boards'] })
-    const previousBoards: IBoard[] | undefined = queryClient.getQueryData(['boards'])
-    const updatedBoards = previousBoards?.map(board => {
-        if (board.id === id) {
-            return {...board, isFavorite: !board.isFavorite};
-        }
-        return board;
-    })
-    queryClient.setQueryData(['boards'], () => updatedBoards)
+    await queryClient.cancelQueries({ queryKey: ['board', id] })
 
-    return { previousBoards }
-}
+    const previousBoards = queryClient.getQueryData<IBoard[]>(['boards']);
+    const previousBoard = queryClient.getQueryData<IBoardView>(['board', id]);
+
+    const updatedBoards = previousBoards?.map(board =>
+        board.id === id ? { ...board, isFavorite: !board.isFavorite } : board
+    );
+
+    const updatedBoard = previousBoard
+        ? { ...previousBoard, isFavorite: !previousBoard.isFavorite }
+        : undefined;
+
+    if (updatedBoards) {
+        queryClient.setQueryData(['boards'], updatedBoards);
+    }
+
+    if (updatedBoard) {
+        queryClient.setQueryData(['board', id], updatedBoard);
+    }
+
+    return { previousBoards, previousBoard };
+};

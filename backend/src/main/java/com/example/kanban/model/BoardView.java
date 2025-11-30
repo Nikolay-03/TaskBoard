@@ -11,6 +11,7 @@ public class BoardView {
     private Instant createdAt;
     private Instant updatedAt;
     private List<BoardColumnView> columns;
+    private Boolean isFavorite;
 
     public long getId() {
         return id;
@@ -67,4 +68,7 @@ public class BoardView {
     public void setColumns(List<BoardColumnView> columns) {
         this.columns = columns;
     }
+
+    public Boolean getIsFavorite() { return isFavorite; }
+    public void setIsFavorite(Boolean isFavorite) { this.isFavorite = isFavorite; }
 }
