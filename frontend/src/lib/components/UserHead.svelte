@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Avatar, AvatarFallback, AvatarImage} from '$lib/ui/avatar';
+    import {UserAvatar} from '$lib/components';
     import {useUser} from '$api/user';
     import {Skeleton} from "$lib/ui/skeleton";
     import {navigate} from "sv-router/generated";
@@ -19,15 +19,7 @@
         variant="outline"
         size="lg"
 >
-    <Avatar>
-        <AvatarImage
-                src={user.data?.avatar}
-                alt="User avatar"
-        />
-        <AvatarFallback>
-            <Skeleton class="size-full"/>
-        </AvatarFallback>
-    </Avatar>
+    <UserAvatar avatar={user.data?.avatar}/>
     {#if user.isLoading || !user.data}
         <Skeleton class="w-[150px] h-3"/>
     {:else}
