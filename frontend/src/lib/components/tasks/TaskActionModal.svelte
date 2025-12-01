@@ -79,6 +79,7 @@
 					await createTaskMutation.mutateAsync({ columnId, body: data });
 				} else if (mode === 'edit' && defaultValues?.id) {
 					await updateTaskMutation.mutateAsync({ id: defaultValues.id, body: data });
+					await queryClient.invalidateQueries({queryKey: ['task', defaultValues.id]})
 				}
 				onOpenChange(false);
 				await queryClient.invalidateQueries({ queryKey: ['board', boardId] });

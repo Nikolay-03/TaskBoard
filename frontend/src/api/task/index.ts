@@ -18,7 +18,6 @@ export const useGetTask = (id: number) =>
 	createQuery<ITask>(() => ({
 		queryKey: ['task', id],
 		queryFn: () => api.get(`/tasks/${id}`),
-		enabled: false
 	}));
 export const useDeleteTask = () =>
 	createMutation<void, Error, number>(() => ({
