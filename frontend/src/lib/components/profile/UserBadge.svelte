@@ -7,7 +7,7 @@
     let {name, onDelete, avatar, color, id}: IUserBadgeItem = $props()
 </script>
 <Badge variant={color}>
-    <UserAvatar avatar={avatar}/>
+    <UserAvatar avatar={avatar} className="size-6"/>
     {name}
     {#if onDelete}
         <Button onclick={() => onDelete(id)} variant="clean" size="fit">
