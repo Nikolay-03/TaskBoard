@@ -14,7 +14,7 @@ public class UserRepository {
     }
 
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT id, email, password_hash, name, created_at FROM users WHERE email = ?";
+        String sql = "SELECT id, email, password_hash, name, avatar, created_at FROM users WHERE email = ?";
         try (Connection con = cm.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -25,23 +25,25 @@ public class UserRepository {
                 u.setEmail(rs.getString("email"));
                 u.setPasswordHash(rs.getString("password_hash"));
                 u.setName(rs.getString("name"));
+                u.setAvatar(rs.getString("avatar"));
                 u.setCreatedAt(rs.getTimestamp("created_at").toInstant());
                 return u;
             }
         }
     }
 
-    public User createUser(String email, String passwordHash, String name) throws SQLException {
+    public User createUser(String email, String passwordHash, String name, String avatar) throws SQLException {
         String sql = """
-            INSERT INTO users(email, password_hash, name)
-            VALUES (?, ?, ?)
-            RETURNING id, email, password_hash, name, created_at
+            INSERT INTO users(email, password_hash, name, avatar)
+            VALUES (?, ?, ?, ?)
+            RETURNING id, email, password_hash, name, avatar, created_at
             """;
         try (Connection con = cm.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setString(2, passwordHash);
             ps.setString(3, name);
+            ps.setString(4, avatar);
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
                 User u = new User();
@@ -49,6 +51,7 @@ public class UserRepository {
                 u.setEmail(rs.getString("email"));
                 u.setPasswordHash(rs.getString("password_hash"));
                 u.setName(rs.getString("name"));
+                u.setAvatar(rs.getString("avatar"));
                 u.setCreatedAt(rs.getTimestamp("created_at").toInstant());
                 return u;
             }
@@ -56,7 +59,7 @@ public class UserRepository {
     }
 
     public User findById(long id) throws SQLException {
-        String sql = "SELECT id, email, password_hash, name, created_at FROM users WHERE id = ?";
+        String sql = "SELECT id, email, password_hash, name, avatar, created_at FROM users WHERE id = ?";
         try (Connection con = cm.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, id);
@@ -67,6 +70,33 @@ public class UserRepository {
                 u.setEmail(rs.getString("email"));
                 u.setPasswordHash(rs.getString("password_hash"));
                 u.setName(rs.getString("name"));
+                u.setAvatar(rs.getString("avatar"));
+                u.setCreatedAt(rs.getTimestamp("created_at").toInstant());
+                return u;
+            }
+        }
+    }
+
+    public User updateUser(long id, String name, String avatar) throws SQLException {
+        String sql = """
+            UPDATE users
+            SET name = ?, avatar = ?
+            WHERE id = ?
+            RETURNING id, email, password_hash, name, avatar, created_at
+            """;
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, avatar);
+            ps.setLong(3, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                User u = new User();
+                u.setId(rs.getLong("id"));
+                u.setEmail(rs.getString("email"));
+                u.setPasswordHash(rs.getString("password_hash"));
+                u.setName(rs.getString("name"));
+                u.setAvatar(rs.getString("avatar"));
                 u.setCreatedAt(rs.getTimestamp("created_at").toInstant());
                 return u;
             }

@@ -30,8 +30,6 @@ public class AuthHandler implements HttpHandler {
                 handleRegister(exchange);
             } else if (path.endsWith("/login") && "POST".equalsIgnoreCase(method)) {
                 handleLogin(exchange);
-            } else if (path.endsWith("/me") && "GET".equalsIgnoreCase(method)) {
-                handleMe(exchange);
             } else if (path.endsWith("/logout") && "POST".equalsIgnoreCase(method)) {
                 handleLogout(exchange);
             } else {
@@ -50,7 +48,7 @@ public class AuthHandler implements HttpHandler {
             return;
         }
 
-        User u = authService.register(req.email, req.password, req.name);
+        User u = authService.register(req.email, req.password, req.name, req.avatar);
 
         String sessionId = authService.createSession(u.getId());
 
@@ -93,25 +91,6 @@ public class AuthHandler implements HttpHandler {
         }
     }
 
-    private void handleMe(HttpExchange ex) throws Exception {
-        String sessionId = extractSessionId(ex);
-        if (sessionId == null) {
-            sendError(ex, 401, "No session");
-            return;
-        }
-
-        User u = authService.getUserBySession(sessionId);
-        if (u == null) {
-            sendError(ex, 401, "Invalid session");
-            return;
-        }
-
-        ex.sendResponseHeaders(200, 0);
-        try (OutputStream os = ex.getResponseBody()) {
-            JsonUtils.writeJson(os, u);
-        }
-    }
-
     private void handleLogout(HttpExchange ex) throws Exception {
         String sessionId = extractSessionId(ex);
         if (sessionId != null) {
@@ -150,6 +129,7 @@ public class AuthHandler implements HttpHandler {
         public String email;
         public String password;
         public String name;
+        public String avatar;
     }
 
     public static class LoginRequest {

@@ -23,16 +23,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    format: int64
-                  email:
-                    type: string
-                    format: email
-                  name:
-                    type: string
+                $ref: '#/components/schemas/User'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -76,25 +67,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /api/auth/me:
-    get:
-      summary: Текущий пользователь по сессии
-      tags: [Auth]
-      security:
-        - SessionHeader: []
-        - SessionCookie: []
-      responses:
-        '200':
-          description: Текущий пользователь
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalError'
-
   /api/auth/logout:
     post:
       summary: Выход из системы
@@ -105,6 +77,51 @@ paths:
       responses:
         '204':
           description: Успешный выход (без тела)
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /me:
+    get:
+      summary: Получить информацию о текущем пользователе
+      tags: [User]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Информация о текущем пользователе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      summary: Обновить информацию о текущем пользователе
+      description: Позволяет обновить имя и/или аватар пользователя
+      tags: [User]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Информация о пользователе обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -606,6 +623,14 @@ components:
           format: email
         name:
           type: string
+        avatar:
+          type: string
+          nullable: true
+          description: URL аватара пользователя
+        createdAt:
+          type: string
+          format: date-time
+          description: Дата создания пользователя
 
     RegisterRequest:
       type: object
@@ -618,6 +643,10 @@ components:
           type: string
         name:
           type: string
+        avatar:
+          type: string
+          nullable: true
+          description: URL аватара пользователя
 
     LoginRequest:
       type: object
@@ -869,3 +898,15 @@ components:
           format: int32
           nullable: true
           description: Новая позиция колонки. При изменении позиции автоматически пересчитываются позиции других колонок.
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: Новое имя пользователя. Если не указано, останется прежним.
+        avatar:
+          type: string
+          nullable: true
+          description: Новый URL аватара пользователя. Если не указано, останется прежним.

@@ -21,13 +21,13 @@ public class AuthService {
         this.sessionRepository = sessionRepository;
     }
 
-    public User register(String email, String password, String name) throws Exception {
+    public User register(String email, String password, String name, String avatar) throws Exception {
         User existing = userRepository.findByEmail(email);
         if (existing != null) {
             throw new IllegalStateException("User already exists");
         }
         String hash = hashPassword(password);
-        return userRepository.createUser(email, hash, name);
+        return userRepository.createUser(email, hash, name, avatar);
     }
 
     public User login(String email, String password) throws Exception {

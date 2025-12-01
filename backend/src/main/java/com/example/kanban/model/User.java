@@ -10,6 +10,7 @@ public class User {
     @JsonIgnore
     private String passwordHash;
     private String name;
+    private String avatar;
     private Instant createdAt;
 
     public long getId() { return id; }
@@ -23,6 +24,9 @@ public class User {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }

@@ -40,6 +40,7 @@ public class Main {
                 labelRepo
         );
         ColumnHandler columnHandler = new ColumnHandler(authService, columnRepo);
+        UserHandler userHandler = new UserHandler(authService, userRepo);
 
         HttpServer server = HttpServer.create(new InetSocketAddress(config.getServerPort()), 0);
         server.createContext("/openapi.yaml", new OpenApiHandler());
@@ -49,12 +50,14 @@ public class Main {
         var boardsContext = server.createContext("/api/boards", new BoardHandler(authService, boardService));
         var tasksContext = server.createContext("/api/tasks", taskHandler);
         var columnsContext = server.createContext("/api/columns", columnHandler);
+        var meContext = server.createContext("/me", userHandler);
         CorsFilter corsFilter = new CorsFilter();
         authContext.getFilters().add(corsFilter);
         labelsContext.getFilters().add(corsFilter);
         boardsContext.getFilters().add(corsFilter);
         tasksContext.getFilters().add(corsFilter);
         columnsContext.getFilters().add(corsFilter);
+        meContext.getFilters().add(corsFilter);
         server.setExecutor(null);
         server.start();
 
