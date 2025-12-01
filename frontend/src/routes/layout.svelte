@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { ModeWatcher } from 'mode-watcher';
-	import { Menu, UserAvatar } from '$lib/components';
+	import { Menu, UserHead} from '$lib/components';
 	import { MainWrapper } from '$lib/ui';
 	import type { Snippet } from 'svelte';
 	import { navigate } from 'sv-router/generated';
-	import { useUser } from '$api/auth';
+	import { useUser } from '$api/user';
 	import { Spinner } from '$lib/ui/spinner';
 	import { Toaster } from '$lib/ui/sonner';
 
@@ -29,8 +29,8 @@
 		<Menu />
 		<section class="flex w-full flex-1 flex-col gap-4 overflow-hidden">
 			<div class="relative flex items-center justify-center">
-				<h1 class="text-4xl font-bold">PlanForge</h1>
-				<UserAvatar className="absolute right-0" />
+				<h1 class="text-4xl font-bold capitalize">Kanbanned</h1>
+				<UserHead className="absolute right-0" />
 			</div>
 			<MainWrapper>
 				{@render children?.()}

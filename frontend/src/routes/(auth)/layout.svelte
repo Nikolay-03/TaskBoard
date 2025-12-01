@@ -2,7 +2,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import type { Snippet } from 'svelte';
 	import { Toaster } from '$lib/ui/sonner';
-	import { useUser } from '$api/auth';
+	import { useUser } from '$api/user';
 	import { navigate } from 'sv-router/generated';
 	import { Spinner } from '$lib/ui/spinner';
 
@@ -22,7 +22,7 @@
 	{#if userMutation.isLoading}
 		<Spinner class="size-15" />
 	{:else}
-		<h1 class="text-8xl font-bold">PlanForge</h1>
+		<h1 class="text-8xl font-bold capitalize">Kanbanned</h1>
 		{@render children?.()}
 	{/if}
 </main>

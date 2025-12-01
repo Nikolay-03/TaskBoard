@@ -7,6 +7,7 @@ import BoardsId from '../src/routes/boards/[id].svelte';
 import FavoritesIndex from '../src/routes/favorites/index.svelte';
 import Index from '../src/routes/index.svelte';
 import Layout from '../src/routes/layout.svelte';
+import MeIndex from '../src/routes/me/index.svelte';
 
 export const routes = {
   '/(auth)': {
@@ -22,7 +23,10 @@ export const routes = {
     '/': FavoritesIndex
   },
   '/': Index,
-  'layout': Layout
+  'layout': Layout,
+  '/me': {
+    '/': MeIndex
+  }
 };
 export type Routes = typeof routes;
 export const { p, navigate, isActive, preload, route } = createRouter(routes);

@@ -1,6 +1,6 @@
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 import Star from '@lucide/svelte/icons/star';
-import Settings from '@lucide/svelte/icons/settings';
+import User from '@lucide/svelte/icons/user';
 import type { Component } from 'svelte';
 
 export interface IMenuItem {
@@ -25,8 +25,8 @@ export const menuItems: IMenuItem[] = [
 	},
 	{
 		id: '3',
-		name: 'Settings',
-		href: '/settings',
-		icon: Settings
+		name: 'Profile',
+		href: '/me',
+		icon: User
 	}
 ];

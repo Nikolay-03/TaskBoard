@@ -9,10 +9,10 @@
 		<Button
 			variant="ghost"
 			size="lg"
-			class="w-full justify-start gap-2"
-			onclick={() => navigate(item.href)}
+			class="w-full justify-start gap-3 text-base font-semibold"
+			onclick={() => navigate(item.href, {viewTransition: true})}
 		>
-			<svelte:component this={item.icon} size={20} />
+			<svelte:component this={item.icon} size={30} class="size-6"/>
 			{item.name}
 		</Button>
 	</li>

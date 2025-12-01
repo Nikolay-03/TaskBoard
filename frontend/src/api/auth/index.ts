@@ -16,12 +16,7 @@ export const useRegister = () =>
 		mutationKey: ['register'],
 		mutationFn: (body: IRegisterBody) => api.post<IUser, IRegisterBody>('/auth/register', body)
 	}));
-export const useUser = () =>
-	createQuery(() => ({
-		queryKey: ['me'],
-		queryFn: () => api.get<IUser>('/auth/me'),
-		retry: false
-	}));
+
 export const useLogout = () =>
 	createMutation(() => ({
 		mutationKey: ['logout'],

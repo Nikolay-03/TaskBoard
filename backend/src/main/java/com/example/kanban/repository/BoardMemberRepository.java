@@ -27,6 +27,7 @@ public class BoardMemberRepository {
                 member.setId(rs.getLong("id"));
                 member.setEmail(rs.getString("email"));
                 member.setName(rs.getString("name"));
+                member.setAvatar(rs.getString("avatar"));
                 member.setCreatedAt(rs.getTimestamp("created_at").toInstant());
                 members.add(member);
             }

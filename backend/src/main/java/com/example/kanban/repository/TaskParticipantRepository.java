@@ -25,6 +25,7 @@ public class TaskParticipantRepository {
                 user.setId(rs.getLong("id"));
                 user.setEmail(rs.getString("email"));
                 user.setName(rs.getString("name"));
+                user.setAvatar(rs.getString("avatar"));
                 user.setCreatedAt(rs.getTimestamp("created_at").toInstant());
                 result.add(user);
             }
