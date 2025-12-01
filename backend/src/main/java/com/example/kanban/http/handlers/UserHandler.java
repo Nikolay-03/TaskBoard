@@ -24,15 +24,25 @@ public class UserHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=utf-8");
 
         try {
             User user = requireAuth(exchange);
             if (user == null) return;
-
-            if ("GET".equalsIgnoreCase(method)) {
+            String[] parts = path.split("/");
+            if ("GET".equalsIgnoreCase(method)
+                    && parts.length == 3
+                    && "api".equals(parts[1])
+                    && "me".equals(parts[2])
+            ) {
                 handleGetMe(exchange, user);
-            } else if ("PATCH".equalsIgnoreCase(method)) {
+            } else if ("PATCH".equalsIgnoreCase(method)
+                    && parts.length == 3
+                    && "api".equals(parts[1])
+                    && "me".equals(parts[2])
+            ) {
+
                 handleUpdateMe(exchange, user);
             } else {
                 sendError(exchange, 405, "Method not allowed");

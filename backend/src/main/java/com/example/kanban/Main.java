@@ -50,7 +50,7 @@ public class Main {
         var boardsContext = server.createContext("/api/boards", new BoardHandler(authService, boardService));
         var tasksContext = server.createContext("/api/tasks", taskHandler);
         var columnsContext = server.createContext("/api/columns", columnHandler);
-        var meContext = server.createContext("/me", userHandler);
+        var meContext = server.createContext("/api/me", userHandler);
         CorsFilter corsFilter = new CorsFilter();
         authContext.getFilters().add(corsFilter);
         labelsContext.getFilters().add(corsFilter);
