@@ -6,6 +6,7 @@
 	import { CardContent } from '$lib/ui/card';
 	import { type ITask } from '$api/task';
 	import { Button } from '$lib/ui/button';
+	import {UserBadges} from "$lib/components/profile";
 
 	let {
 		id,
@@ -54,9 +55,9 @@
 					</div>
 				</div>
 			</CardHeader>
-			<CardContent class="flex flex-col gap-4">
+			<CardContent class="flex flex-col gap-10">
 				<TaskBadges items={labels} />
-				<TaskBadges items={assignees} />
+				<UserBadges users={assignees} />
 			</CardContent>
 		</Card>
 	{/snippet}

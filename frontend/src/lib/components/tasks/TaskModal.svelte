@@ -7,6 +7,7 @@
 	import { useGetTask } from '$api/task';
 	import TaskBadges from './shared/TaskBadges.svelte';
 	import { Label } from '$lib/ui/label';
+	import {UserBadges} from "$lib/components/profile";
 
 	interface Props {
 		card: Snippet<[HTMLAttributes<HTMLDivElement>]>;
@@ -52,11 +53,11 @@
 			</div>
 			<div class="flex flex-col gap-1">
 				<Label class="text-base">Assignees</Label>
-				<TaskBadges items={data.assignees} />
+				<UserBadges users={data.assignees} />
 			</div>
 			<div class="flex flex-col gap-1">
 				<Label class="text-base">Participants</Label>
-				<TaskBadges items={data.participants} />
+				<UserBadges users={data.participants} />
 			</div>
 		{/if}
 	</DialogContent>

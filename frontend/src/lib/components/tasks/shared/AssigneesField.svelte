@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { CommandItem } from '$lib/ui/command';
-	import { Badge } from '$lib/ui/badge';
 	import { MultiSelect } from '$lib/components';
 	import type { IUser } from '$api/user';
-	import { TaskBadges } from '$lib/components/tasks';
+	import {UserBadge, UserBadges} from "$lib/components/profile";
 
 	interface Props {
 		assignees: number[];
@@ -21,10 +20,10 @@
 	const handleAddAssignee = (id: number) => assignees.push(id);
 </script>
 
-<TaskBadges items={selectedAssignees} onDelete={handleDeleteAssignee} />
+<UserBadges users={selectedAssignees} onDelete={handleDeleteAssignee} />
 <MultiSelect {open} {handleOpenChange} heading="Assignees">
 	{#snippet renderSelected()}
-		<TaskBadges items={selectedAssignees} onDelete={handleDeleteAssignee} className="p-2" />
+		<UserBadges users={selectedAssignees} onDelete={handleDeleteAssignee} className="p-2"/>
 	{/snippet}
 	{#snippet renderOptions()}
 		{#if members}
@@ -34,7 +33,7 @@
 					disabled={assignees.includes(member.id)}
 					value={member.name}
 				>
-					<Badge variant="slate">{member.name}</Badge>
+					<UserBadge {...member}/>
 				</CommandItem>
 			{/each}
 		{/if}
