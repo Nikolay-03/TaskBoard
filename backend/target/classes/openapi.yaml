@@ -170,6 +170,7 @@ paths:
           $ref: '#/components/responses/InternalError'
     post:
       summary: Создать доску
+      description: Создает новую доску с указанным названием, описанием и списком участников. Владелец автоматически добавляется в участники.
       tags: [Boards]
       security:
         - SessionHeader: []
@@ -904,6 +905,15 @@ components:
           type: string
           nullable: true
           description: Описание доски
+        members:
+          type: array
+          items:
+            type: integer
+            format: int64
+          nullable: true
+          description: >
+            Список ID пользователей-участников доски. Если не указано, доска создается без участников.
+            Владелец автоматически добавляется в список участников, даже если он не указан в запросе.
 
     UpdateBoardRequest:
       type: object

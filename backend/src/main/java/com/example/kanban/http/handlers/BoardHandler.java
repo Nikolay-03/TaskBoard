@@ -152,7 +152,7 @@ public class BoardHandler implements HttpHandler {
                 return;
             }
 
-            Board board = boardService.createBoard(user.getId(), req.title, req.description);
+            Board board = boardService.createBoard(user.getId(), req.title, req.description, req.members);
 
             ex.sendResponseHeaders(201, 0);
             try (OutputStream os = ex.getResponseBody()) {
@@ -317,6 +317,7 @@ public class BoardHandler implements HttpHandler {
     public static class CreateBoardRequest {
         public String title;
         public String description;
+        public List<Long> members;
     }
 
     public static class UpdateBoardRequest {

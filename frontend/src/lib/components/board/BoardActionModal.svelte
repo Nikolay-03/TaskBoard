@@ -44,23 +44,23 @@
 
 	const handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
-		const data: BoardSchema = {
+		const body = {
 			title,
-			description,
-			members
+			members,
+			...(description ? { description } : {})
 		};
-		const result = boardSchema.safeParse(data);
+		const result = boardSchema.safeParse(body);
 		if (!result.success) {
 			error = result.error.issues[0].message;
 		} else {
 			error = null;
 			try {
 				if (mode === 'create') {
-					const response = await createBoardMutation.mutateAsync({ title, description, members });
+					const response = await createBoardMutation.mutateAsync(body);
 					navigate(`/boards/${response.id}`, { viewTransition: true });
 				} else if (mode === 'edit' && defaultValues?.id) {
 					await updateBoardMutation.mutateAsync({
-						body: { title, description, members },
+						body,
 						id: defaultValues.id
 					});
 					await queryClient.invalidateQueries({ queryKey: ['board', defaultValues.id] });

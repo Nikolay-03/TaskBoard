@@ -99,8 +99,20 @@ public class BoardService {
         return view;
     }
 
-    public Board createBoard(long ownerId, String title, String description) throws SQLException {
-        return boardRepository.createBoard(ownerId, title, description);
+    public Board createBoard(long ownerId, String title, String description, List<Long> memberIds) throws SQLException {
+        Board board = boardRepository.createBoard(ownerId, title, description);
+        
+        // Если переданы участники, добавляем их
+        if (memberIds != null && !memberIds.isEmpty()) {
+            // Убеждаемся, что владелец всегда в списке участников
+            List<Long> finalMemberIds = new ArrayList<>(memberIds);
+            if (!finalMemberIds.contains(ownerId)) {
+                finalMemberIds.add(ownerId);
+            }
+            boardMemberRepository.setMembers(board.getId(), finalMemberIds);
+        }
+        
+        return board;
     }
 
     public Board updateBoard(long boardId, long userId, String title, String description)
