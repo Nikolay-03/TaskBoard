@@ -69,7 +69,7 @@
 						Sign in</a
 					></span
 				>
-				<Button type="submit" class="w-fit" disabled={registrationUser.isLoading}>Sign up</Button>
+				<Button type="submit" class="w-fit" disabled={registrationUser.isPending}>Sign up</Button>
 			</div>
 		</form>
 	</CardContent>

@@ -60,7 +60,7 @@
 						Sign up</a
 					></span
 				>
-				<Button type="submit" class="w-fit" disabled={loginMutation.isLoading}>Sign in</Button>
+				<Button type="submit" class="w-fit" disabled={loginMutation.isPending}>Sign in</Button>
 			</div>
 		</form>
 	</CardContent>
