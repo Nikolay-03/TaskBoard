@@ -10,6 +10,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.List;
 
 public class UserHandler implements HttpHandler {
 
@@ -42,8 +43,13 @@ public class UserHandler implements HttpHandler {
                     && "api".equals(parts[1])
                     && "me".equals(parts[2])
             ) {
-
                 handleUpdateMe(exchange, user);
+            } else if ("GET".equalsIgnoreCase(method)
+                    && parts.length == 3
+                    && "api".equals(parts[1])
+                    && "users".equals(parts[2])
+            ) {
+                handleGetUsers(exchange);
             } else {
                 sendError(exchange, 405, "Method not allowed");
             }
@@ -76,6 +82,14 @@ public class UserHandler implements HttpHandler {
         ex.sendResponseHeaders(200, 0);
         try (OutputStream os = ex.getResponseBody()) {
             JsonUtils.writeJson(os, updatedUser);
+        }
+    }
+
+    private void handleGetUsers(HttpExchange ex) throws IOException, SQLException {
+        List<User> users = userRepository.findAll();
+        ex.sendResponseHeaders(200, 0);
+        try (OutputStream os = ex.getResponseBody()) {
+            JsonUtils.writeJson(os, users);
         }
     }
 

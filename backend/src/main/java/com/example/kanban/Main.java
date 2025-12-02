@@ -51,6 +51,7 @@ public class Main {
         var tasksContext = server.createContext("/api/tasks", taskHandler);
         var columnsContext = server.createContext("/api/columns", columnHandler);
         var meContext = server.createContext("/api/me", userHandler);
+        var usersContext = server.createContext("/api/users", userHandler);
         CorsFilter corsFilter = new CorsFilter();
         authContext.getFilters().add(corsFilter);
         labelsContext.getFilters().add(corsFilter);
@@ -58,6 +59,7 @@ public class Main {
         tasksContext.getFilters().add(corsFilter);
         columnsContext.getFilters().add(corsFilter);
         meContext.getFilters().add(corsFilter);
+        usersContext.getFilters().add(corsFilter);
         server.setExecutor(null);
         server.start();
 

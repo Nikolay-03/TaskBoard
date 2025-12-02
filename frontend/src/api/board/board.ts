@@ -16,10 +16,12 @@ export interface IBoardView extends IBoard {
 export interface ICreateBoardBody {
 	title: string;
 	description?: string;
+	members?: number[];
 }
 interface IUpdateBoardBody {
 	title: string;
-	description: string;
+	description?: string;
+	members?: number[];
 }
 export interface IUpdateBoardVariables {
 	id: number;

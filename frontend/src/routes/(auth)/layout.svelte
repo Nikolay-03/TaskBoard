@@ -8,9 +8,9 @@
 
 	let { children }: { children: Snippet } = $props();
 
-	const userMutation = useUser();
+	const userQuery = useUser();
 	$effect(() => {
-		if (!userMutation.isLoading && !userMutation.isError) {
+		if (!userQuery.isLoading && !userQuery.isError) {
 			navigate('/');
 		}
 	});
@@ -19,7 +19,7 @@
 <main class="flex min-h-dvh min-w-dvh flex-col items-center justify-center gap-15 bg-background">
 	<ModeWatcher />
 	<Toaster />
-	{#if userMutation.isLoading}
+	{#if userQuery.isLoading}
 		<Spinner class="size-15" />
 	{:else}
 		<h1 class="text-8xl font-bold capitalize">Kanbanned</h1>

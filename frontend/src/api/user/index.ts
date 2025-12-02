@@ -4,11 +4,17 @@ import type {IUpdateUserBody, IUser} from "./user";
 
 export * from './user';
 
+export const useUsers = () =>
+    createQuery<void, Error, IUser[]>(() => ({
+        queryKey: ['users'],
+        queryFn: () => api.get('/users'),
+    }));
+
 export const useUser = () =>
     createQuery<void, Error, IUser>(() => ({
         queryKey: ['me'],
         queryFn: () => api.get('/me'),
-        retry: false
+        retry: false,
     }));
 export const useUpdateUser = () => createMutation<IUser, Error, IUpdateUserBody>(() => ({
     mutationKey: ['updateUser'],

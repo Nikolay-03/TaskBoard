@@ -8,11 +8,11 @@
 	import { Spinner } from '$lib/ui/spinner';
 	import { Toaster } from '$lib/ui/sonner';
 
-	const userMutation = useUser();
+	let userQuery = useUser();
 
 	let { children }: { children: Snippet } = $props();
 	$effect(() => {
-		if (userMutation.isError) {
+		if (userQuery.isError) {
 			navigate('/auth/login');
 		}
 	});
@@ -21,7 +21,7 @@
 <div class="flex h-dvh w-dvw gap-4 bg-background p-4">
 	<ModeWatcher />
 	<Toaster />
-	{#if userMutation.isLoading}
+	{#if userQuery.isLoading}
 		<div class="flex h-full w-full items-center justify-center">
 			<Spinner class="size-15" />
 		</div>

@@ -21,13 +21,14 @@ export const useBoard = (id: number) =>
 		queryFn: () => api.get(`/boards/${id}`),
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
-		enabled: Boolean(id)
+		enabled: Boolean(id),
 	}));
 
-export const useMembers = (id: number) =>
+export const useMembers = (id?: number) =>
 	createQuery<IUser[]>(() => ({
 		queryKey: ['members', id],
-		queryFn: () => api.get(`/boards/${id}/members`)
+		queryFn: () => api.get(`/boards/${id}/members`),
+		enabled: Boolean(id)
 	}));
 export const useCreateBoard = () =>
 	createMutation<IBoard, Error, ICreateBoardBody>(() => ({

@@ -181,4 +181,29 @@ public class BoardService {
         }
         return boards;
     }
+
+    public void updateBoardMembers(long boardId, long userId, List<Long> memberIds)
+            throws SQLException, IllegalAccessException {
+        Board board = boardRepository.findBoardById(boardId);
+        if (board == null) throw new NoSuchElementException("Board not found");
+        if (board.getOwnerId() != userId) throw new IllegalAccessException("Forbidden");
+
+        // Если memberIds null, ничего не делаем (не обновляем участников)
+        if (memberIds == null) {
+            return;
+        }
+
+        // Убеждаемся, что владелец всегда в списке участников
+        List<Long> finalMemberIds = new ArrayList<>(memberIds);
+        if (!finalMemberIds.contains(board.getOwnerId())) {
+            finalMemberIds.add(board.getOwnerId());
+        }
+
+        // Если после добавления владельца список все еще пуст (не должно случиться, но на всякий случай)
+        if (finalMemberIds.isEmpty()) {
+            throw new IllegalArgumentException("Members list cannot be empty");
+        }
+
+        boardMemberRepository.setMembers(boardId, finalMemberIds);
+    }
 }

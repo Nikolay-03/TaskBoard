@@ -198,6 +198,11 @@ public class BoardHandler implements HttpHandler {
 
             Board updatedBoard = boardService.updateBoard(boardId, user.getId(), title, description);
 
+            // Обновляем участников, если они переданы
+            if (req.members != null) {
+                boardService.updateBoardMembers(boardId, user.getId(), req.members);
+            }
+
             ex.sendResponseHeaders(200, 0);
             try (OutputStream os = ex.getResponseBody()) {
                 JsonUtils.writeJson(os, updatedBoard);
@@ -206,6 +211,8 @@ public class BoardHandler implements HttpHandler {
             sendError(ex, 404, "Board not found");
         } catch (IllegalAccessException e) {
             sendError(ex, 403, "Access denied");
+        } catch (IllegalArgumentException e) {
+            sendError(ex, 400, e.getMessage());
         }
     }
     private void handleDeleteBoard(HttpExchange ex, long boardId) throws Exception {
@@ -315,5 +322,6 @@ public class BoardHandler implements HttpHandler {
     public static class UpdateBoardRequest {
         public String title;
         public String description;
+        public List<Long> members;
     }
 }

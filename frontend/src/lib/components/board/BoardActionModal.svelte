@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import {UsersIcon} from '@lucide/svelte'
 	import { DialogTrigger, Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/ui/dialog';
 	import type { Snippet } from 'svelte';
 	import { Button, type ButtonProps } from '$lib/ui/button';
@@ -8,9 +9,11 @@
 	import { queryClient } from '$api';
 	import { type BoardSchema, boardSchema } from './schema';
 	import { getRequestErrorMessage } from '$lib/utils';
-	import { type IBoard, useCreateBoard, useDeleteBoard } from '$api/board';
+	import {type IBoard, useCreateBoard, useDeleteBoard, useMembers} from '$api/board';
 	import { useUpdateBoard } from '$api/board/index.js';
 	import { navigate } from 'sv-router/generated';
+	import BoardMembersField from "$lib/components/board/BoardMembersField.svelte";
+	import {useUsers} from "$api/user";
 
 	type ModeType = 'edit' | 'create';
 
@@ -24,12 +27,18 @@
 
 	let { trigger, mode = 'create', defaultValues }: Props = $props();
 
+	let membersModalOpen = $state<boolean>(false);
+
 	let title = $state<string>('');
 	let description = $state<string | undefined>();
+	let members = $state<number[]>([])
 
 	const createBoardMutation = useCreateBoard();
 	const updateBoardMutation = useUpdateBoard();
 	const deleteBoardMutation = useDeleteBoard();
+
+	const users = useUsers();
+	const membersQuery = useMembers(defaultValues?.id)
 
 	let error = $state<string | null>(null);
 
@@ -37,7 +46,8 @@
 		e.preventDefault();
 		const data: BoardSchema = {
 			title,
-			description
+			description,
+			members
 		};
 		const result = boardSchema.safeParse(data);
 		if (!result.success) {
@@ -46,14 +56,15 @@
 			error = null;
 			try {
 				if (mode === 'create') {
-					const response = await createBoardMutation.mutateAsync({ title, description });
+					const response = await createBoardMutation.mutateAsync({ title, description, members });
 					navigate(`/boards/${response.id}`, { viewTransition: true });
 				} else if (mode === 'edit' && defaultValues?.id) {
 					await updateBoardMutation.mutateAsync({
-						body: { title, description },
+						body: { title, description, members },
 						id: defaultValues.id
 					});
 					await queryClient.invalidateQueries({ queryKey: ['board', defaultValues.id] });
+					await queryClient.invalidateQueries({ queryKey: ['members', defaultValues.id] });
 				}
 				onOpenChange(false);
 			} catch (err) {
@@ -78,10 +89,14 @@
 	const onOpenChange = (openVal: boolean) => {
 		open = openVal;
 	};
+	const handleMembersModalOpenChange = (open: boolean) => {
+		membersModalOpen = open;
+	};
 	$effect(() => {
 		if (open) {
 			title = defaultValues?.title ?? '';
 			description = defaultValues?.description;
+			members = membersQuery.data?.map(member => member.id) ?? []
 		}
 	});
 </script>
@@ -99,6 +114,16 @@
 		<form onsubmit={handleSubmit} class="flex flex-col gap-3">
 			<InputField title="Title" bind:value={title} placeholder="Task title" />
 			<InputField title="Description" bind:value={description} placeholder="Task description" />
+			<Button onclick={() => (membersModalOpen = true)} variant="outline">
+				Select members
+				<UsersIcon/>
+			</Button>
+			<BoardMembersField
+					open={membersModalOpen}
+					handleOpenChange={handleMembersModalOpenChange}
+					users={users.data}
+					bind:members
+			/>
 			{#if error}
 				<div class="text-sm text-destructive" transition:fade>{error}</div>
 			{/if}

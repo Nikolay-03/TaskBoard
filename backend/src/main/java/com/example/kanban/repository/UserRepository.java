@@ -102,4 +102,25 @@ public class UserRepository {
             }
         }
     }
+
+    public java.util.List<User> findAll() throws SQLException {
+        String sql = "SELECT id, email, password_hash, name, avatar, created_at FROM users ORDER BY id";
+        java.util.List<User> users = new java.util.ArrayList<>();
+        try (Connection con = cm.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User u = new User();
+                    u.setId(rs.getLong("id"));
+                    u.setEmail(rs.getString("email"));
+                    u.setPasswordHash(rs.getString("password_hash"));
+                    u.setName(rs.getString("name"));
+                    u.setAvatar(rs.getString("avatar"));
+                    u.setCreatedAt(rs.getTimestamp("created_at").toInstant());
+                    users.add(u);
+                }
+            }
+        }
+        return users;
+    }
 }

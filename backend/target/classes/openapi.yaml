@@ -80,6 +80,28 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /api/users:
+    get:
+      summary: Получить список всех пользователей
+      description: Возвращает список всех зарегистрированных пользователей системы
+      tags: [User]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /me:
     get:
       summary: Получить информацию о текущем пользователе
@@ -233,6 +255,7 @@ paths:
           $ref: '#/components/responses/InternalError'
     patch:
       summary: Обновить доску
+      description: Позволяет обновить название, описание и список участников доски. Только владелец доски может изменять участников. Владелец не может удалить себя из участников.
       tags: [Boards]
       security:
         - SessionHeader: []
@@ -299,6 +322,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '404':
+          description: Доска не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/boards/{boardId}/members:
+    get:
+      summary: Получить список участников доски
+      tags: [Boards]
+      security:
+        - SessionHeader: []
+        - SessionCookie: []
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Список участников доски
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: Доска не найдена
           content:
@@ -859,6 +916,16 @@ components:
           type: string
           nullable: true
           description: Новое описание доски. Если не указано, останется прежним.
+        members:
+          type: array
+          items:
+            type: integer
+            format: int64
+          nullable: true
+          description: >
+            Список ID пользователей-участников доски. Если не указано, список участников не изменяется.
+            Только владелец доски может изменять участников. Владелец автоматически добавляется в список участников,
+            даже если он не указан в запросе.
 
     Column:
       type: object
