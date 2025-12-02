@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import {TagsIcon, UserPlusIcon} from '@lucide/svelte'
 	import { DialogTrigger, Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/ui/dialog';
 	import type { Snippet } from 'svelte';
 	import { Button, type ButtonProps } from '$lib/ui/button';
@@ -130,7 +131,10 @@
 			<InputField title="Title" bind:value={title} placeholder="Task title" />
 			<TextAreaField title="Description" bind:value={description} placeholder="Task description" />
 			<DateField title="Deadline date" bind:value={dueDate} />
-			<Button onclick={() => (labelsModalOpen = true)} variant="outline">Select labels</Button>
+			<Button onclick={() => (labelsModalOpen = true)} variant="outline">
+				Select labels
+				<TagsIcon/>
+			</Button>
 			<LabelsField
 				open={labelsModalOpen}
 				handleOpenChange={handleLabelModalOpenChange}
@@ -139,6 +143,7 @@
 			/>
 			<Button onclick={() => (assigneesModalOpen = true)} variant="outline">
 				Select assignees
+				<UserPlusIcon/>
 			</Button>
 			<AssigneesField
 				open={assigneesModalOpen}
@@ -148,6 +153,7 @@
 			/>
 			<Button onclick={() => (participantsModalOpen = true)} variant="outline">
 				Select participants
+				<UserPlusIcon/>
 			</Button>
 			<ParticipantsField
 				open={participantsModalOpen}
