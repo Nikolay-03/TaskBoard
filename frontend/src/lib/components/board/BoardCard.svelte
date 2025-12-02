@@ -33,7 +33,7 @@
 		<div class="flex justify-between">
 			<CardTitle class="text-xl">{title}</CardTitle>
 			<Button variant="clean" size="fit" onclick={handleToggleFavorite}>
-				<StarIcon class={[{ 'fill-white': isFavorite }]} />
+				<StarIcon class={[{ 'fill-foreground': isFavorite }]} />
 			</Button>
 		</div>
 		<CardDescription class="text-base">{description}</CardDescription>

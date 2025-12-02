@@ -62,7 +62,7 @@
 					</BoardActionModal>
 				</div>
 				<Button variant="clean" size="fit" onclick={handleToggleFavorite}>
-					<StarIcon class={['size-8', { 'fill-white': board.data.isFavorite }]} />
+					<StarIcon class={['size-8', { 'fill-foreground': board.data.isFavorite }]} />
 				</Button>
 			</div>
 			<h2 class="text-base text-muted-foreground">{board.data.description}</h2>
