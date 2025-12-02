@@ -5,7 +5,7 @@
 		className?: string;
 		avatar?: string | null
 	}
-	const { className, avatar }: Props = $props();
+	let { className, avatar }: Props = $props();
 	
 	let loadingStatus = $state<'loading' | 'loaded' | 'error'>('loading');
 	let previousAvatar = $state(avatar);
@@ -20,7 +20,7 @@
 
 <Avatar class={[className]} bind:loadingStatus>
 	<AvatarImage
-		src={avatar}
+		src={previousAvatar}
 		alt="User avatar"
 	/>
 	<AvatarFallback>
